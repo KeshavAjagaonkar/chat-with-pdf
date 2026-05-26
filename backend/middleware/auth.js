@@ -15,11 +15,15 @@ export const requireAuth = async (req, res, next) => {
             return res.status(401).json({ error: "No token provided" });
         }
 
-        const payload = await clerk.verifyToken(token);
+        const payload = await clerk.verifyToken(token, {
+            secretKey: process.env.CLERK_SECRET_KEY,
+        });
+
         req.userId = payload.sub;
         next();
 
     } catch (error) {
+        console.error("Auth error:", error.message);
         return res.status(401).json({ error: "Invalid token" });
     }
 };
