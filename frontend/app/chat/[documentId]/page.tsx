@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { use } from "react";
 import axios from "axios";
+import { UserButton } from "@clerk/nextjs";
 
 interface Message {
   role: "user" | "assistant";
@@ -65,12 +66,13 @@ export default function ChatPage({
           <h1 className="text-lg font-semibold">Chat with PDF</h1>
           <p className="text-gray-500 text-xs">Document #{documentId}</p>
         </div>
-        
+
         <a href="/"
           className="text-sm text-gray-400 hover:text-white transition"
         >
           ← Upload new
         </a>
+        <UserButton />
       </div>
 
       <div className="flex-1 overflow-y-auto px-6 py-6 flex flex-col gap-3">
@@ -83,11 +85,10 @@ export default function ChatPage({
         {messages.map((msg, i) => (
           <div
             key={i}
-            className={`max-w-xl px-4 py-3 rounded-xl text-sm leading-relaxed ${
-              msg.role === "user"
+            className={`max-w-xl px-4 py-3 rounded-xl text-sm leading-relaxed ${msg.role === "user"
                 ? "bg-blue-600 self-end"
                 : "bg-gray-800 self-start"
-            }`}
+              }`}
           >
             {msg.content}
           </div>
