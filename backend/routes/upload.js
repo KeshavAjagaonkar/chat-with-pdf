@@ -4,7 +4,7 @@ import axios from "axios";
 import FormData from "form-data";
 import fs from "fs";
 import dotenv from "dotenv";
-import { requireAuth } from "../middleware/auth";
+import { requireAuth } from "../middleware/auth.js";
 
 
 dotenv.config();
