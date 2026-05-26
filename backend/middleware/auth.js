@@ -15,11 +15,15 @@ export const requireAuth = async (req, res, next) => {
             return res.status(401).json({ error: "No token provided" });
         }
 
-        const payload = await clerk.verifyToken(token, {
-            secretKey: process.env.CLERK_SECRET_KEY,
+        const requestState = await clerk.authenticateRequest(req, {
+            headerToken: token,
         });
 
-        req.userId = payload.sub;
+        if (!requestState.isAuthenticated) {
+            return res.status(401).json({ error: "Invalid token" });
+        }
+
+        req.userId = requestState.toAuth().userId;
         next();
 
     } catch (error) {
