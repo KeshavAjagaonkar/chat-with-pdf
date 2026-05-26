@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import { useAuth, UserButton } from "@clerk/nextjs";
 
 export default function Home() {
+  const { getToken } = useAuth();
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -28,12 +30,19 @@ export default function Home() {
     setError("");
 
     try {
+      const token = await getToken();
+
       const formData = new FormData();
       formData.append("file", file);
 
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/upload`,
-        formData
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
 
       const { document_id } = response.data;
@@ -48,6 +57,11 @@ export default function Home() {
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center bg-gray-950 text-white px-4">
+
+      <div className="absolute top-4 right-4">
+        <UserButton />
+      </div>
+
       <div className="w-full max-w-md flex flex-col gap-4">
 
         <div className="mb-2">
