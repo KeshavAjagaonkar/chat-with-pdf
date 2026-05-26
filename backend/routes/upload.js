@@ -4,15 +4,18 @@ import axios from "axios";
 import FormData from "form-data";
 import fs from "fs";
 import dotenv from "dotenv";
+import { requireAuth } from "../middleware/auth";
+
 
 dotenv.config();
 
 const router = express.Router();
 const upload = multer({ dest: "uploads/" });
 
-router.post("/", upload.single("file"), async (req, res) => {
+router.post("/", requireAuth, upload.single("file"), async (req, res) => {
     try {
         const file = req.file;
+        const userId = req.userId;
 
         if (!file) {
             return res.status(400).json({ error: "No file uploaded" });
@@ -20,6 +23,7 @@ router.post("/", upload.single("file"), async (req, res) => {
 
         const formData = new FormData();
         formData.append("file", fs.createReadStream(file.path), file.originalname);
+        formData.append("user_id", userId);
 
         const response = await axios.post(
             `${process.env.PYTHON_SERVICE_URL}/process`,
@@ -28,7 +32,6 @@ router.post("/", upload.single("file"), async (req, res) => {
         );
 
         fs.unlinkSync(file.path);
-
         return res.json(response.data);
 
     } catch (error) {
