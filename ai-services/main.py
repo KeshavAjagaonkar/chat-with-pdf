@@ -1,3 +1,4 @@
+from fastapi import Form
 from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -25,7 +26,7 @@ class ChatRequest(BaseModel):
     document_id: int
 
 @app.post("/process")
-async def process_pdf(file: UploadFile = File(...)):
+async def process_pdf(file: UploadFile = File(...), user_id: str = Form(...)):
     temp_path = f"temp_{file.filename}"
 
     with open(temp_path, "wb") as buffer:
@@ -35,7 +36,7 @@ async def process_pdf(file: UploadFile = File(...)):
     chunks = chunk_text(text)
     embedded_chunks = generate_embeddings(chunks)
 
-    document_id = store_document(file.filename)
+    document_id = store_document(file.filename, user_id)
     store_chunks(document_id, embedded_chunks)
 
     os.remove(temp_path)
