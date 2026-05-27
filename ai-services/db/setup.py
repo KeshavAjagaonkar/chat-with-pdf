@@ -11,12 +11,12 @@ def create_tables():
     conn = get_connection()
     cursor = conn.cursor()
 
-    # Updated to include user_id — matches the actual schema used by store_document()
+    # NOTE: The live table also has a user_id column that was added after initial creation.
+    # CREATE TABLE IF NOT EXISTS skips entirely if the table exists, so this is safe to re-run.
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS documents (
             id SERIAL PRIMARY KEY,
             filename TEXT NOT NULL,
-            user_id TEXT NOT NULL,
             uploaded_at TIMESTAMP DEFAULT NOW()
         );
     """)

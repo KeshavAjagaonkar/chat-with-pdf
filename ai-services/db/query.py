@@ -40,7 +40,7 @@ def fetch_user_documents(user_id: str) -> list[dict]:
         {
             "id": row[0],
             "filename": row[1],
-            "uploaded_at": row[2].isoformat()  # Convert datetime to ISO string for JSON
+            "uploaded_at": row[2].isoformat() + "+00:00"  # Mark as UTC so browsers convert to local time
         }
         for row in rows
     ]
