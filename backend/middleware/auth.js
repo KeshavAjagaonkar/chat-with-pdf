@@ -15,15 +15,15 @@ export const requireAuth = async (req, res, next) => {
             return res.status(401).json({ error: "No token provided" });
         }
 
-        const requestState = await clerk.authenticateRequest(req, {
-            headerToken: token,
+        const payload = await clerk.verifyToken(token, {
+            secretKey: process.env.CLERK_SECRET_KEY,
+            authorizedParties: [
+                "https://chat-with-pdf-lac-six.vercel.app",
+                "http://localhost:3000"
+            ],
         });
 
-        if (!requestState.isAuthenticated) {
-            return res.status(401).json({ error: "Invalid token" });
-        }
-
-        req.userId = requestState.toAuth().userId;
+        req.userId = payload.sub;
         next();
 
     } catch (error) {
