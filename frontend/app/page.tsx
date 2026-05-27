@@ -12,9 +12,30 @@ export default function Home() {
   const [error, setError] = useState("");
   const router = useRouter();
 
+  // 10MB in bytes. Defined as a constant so it's easy to change later
+  // and stays consistent between the message shown and the check performed.
+  const MAX_FILE_SIZE = 10 * 1024 * 1024;
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0];
     if (selected) {
+      // Check MIME type — more reliable than file extension.
+      // A user can rename "malware.exe" to "malware.pdf" to bypass extension checks,
+      // but the MIME type is determined by the file's actual content headers.
+      if (selected.type !== "application/pdf") {
+        setError("Only PDF files are allowed.");
+        setFile(null);
+        return;
+      }
+
+      // Check file size — prevents uploading files that would be too large
+      // to process or would consume too many embedding API credits.
+      if (selected.size > MAX_FILE_SIZE) {
+        setError("File must be under 10MB.");
+        setFile(null);
+        return;
+      }
+
       setFile(selected);
       setError("");
     }
@@ -45,8 +66,9 @@ export default function Home() {
         }
       );
 
-      const { document_id } = response.data;
-      router.push(`/chat/${document_id}`);
+      // Redirect to documents list instead of directly to chat.
+      // This lets the user see their new upload in context with all their other PDFs.
+      router.push("/documents");
 
     } catch (err) {
       setError("Upload failed. Make sure the backend is running.");
@@ -102,6 +124,13 @@ export default function Home() {
             {loading ? "Processing PDF..." : "Upload & Start Chat"}
           </button>
         </div>
+
+        <a
+          href="/documents"
+          className="text-sm text-gray-400 hover:text-white transition text-center"
+        >
+          My Documents →
+        </a>
 
       </div>
     </main>

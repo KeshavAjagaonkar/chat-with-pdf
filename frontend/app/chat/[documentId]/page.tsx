@@ -20,8 +20,40 @@ export default function ChatPage({
   const [messages, setMessages] = useState<Message[]>([]);
   const [question, setQuestion] = useState("");
   const [loading, setLoading] = useState(false);
+  const [loadingHistory, setLoadingHistory] = useState(true);
   const [error, setError] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  // Load chat history when the page opens.
+  // This runs once on mount (empty dependency array would cause issues
+  // with getToken, so we include it but getToken is stable across renders).
+  useEffect(() => {
+    const loadHistory = async () => {
+      try {
+        const token = await getToken();
+
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/messages`,
+          {
+            params: { document_id: documentId },
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        setMessages(response.data.messages);
+      } catch (err) {
+        // Don't show an error for history load failure —
+        // the user can still chat, they just won't see past messages.
+        console.error("Failed to load chat history");
+      } finally {
+        setLoadingHistory(false);
+      }
+    };
+
+    loadHistory();
+  }, [documentId, getToken]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -76,17 +108,34 @@ export default function ChatPage({
         </div>
 
         <div className="flex items-center gap-4">
-          <a href="/"
+          <a href="/documents"
             className="text-sm text-gray-400 hover:text-white transition"
           >
-            ← Upload new
+            ← My Documents
           </a>
           <UserButton />
         </div>
       </div>
 
       <div className="flex-1 overflow-y-auto px-6 py-6 flex flex-col gap-3">
-        {messages.length === 0 && (
+        {/* Show loading skeleton while fetching chat history */}
+        {loadingHistory && (
+          <div className="flex flex-col gap-3 mt-4">
+            {[1, 2].map((i) => (
+              <div
+                key={i}
+                className={`max-w-xl px-4 py-3 rounded-xl animate-pulse ${
+                  i % 2 === 1 ? "bg-blue-600/30 self-end" : "bg-gray-800 self-start"
+                }`}
+              >
+                <div className="h-3 bg-gray-700 rounded w-48"></div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Empty state — only show after history has loaded and there are truly no messages */}
+        {!loadingHistory && messages.length === 0 && (
           <p className="text-gray-600 text-sm text-center mt-20">
             Ask anything about your PDF
           </p>
