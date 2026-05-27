@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { use } from "react";
 import axios from "axios";
 import { UserButton, useAuth } from "@clerk/nextjs";
+import ReactMarkdown from "react-markdown";
 
 interface Message {
   role: "user" | "assistant";
@@ -71,25 +72,73 @@ export default function ChatPage({
     try {
       const token = await getToken();
 
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/chat`,
+      // Use fetch() instead of axios for streaming.
+      // Axios buffers the full response — fetch gives us a ReadableStream
+      // that we can read chunk-by-chunk as data arrives from the server.
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/chat/stream`,
         {
-          question: userMessage.content,
-          document_id: parseInt(documentId),
-        },
-        {
+          method: "POST",
           headers: {
+            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
+          body: JSON.stringify({
+            question: userMessage.content,
+            document_id: parseInt(documentId),
+          }),
         }
       );
 
-      const assistantMessage: Message = {
-        role: "assistant",
-        content: response.data.answer,
-      };
+      if (!response.ok) {
+        throw new Error("Stream request failed");
+      }
 
-      setMessages((prev) => [...prev, assistantMessage]);
+      // Add an empty assistant message to the UI immediately.
+      // We'll update its content as chunks arrive.
+      setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
+
+      // Read the SSE stream.
+      // getReader() gives us a pull-based API to read chunks one at a time.
+      // TextDecoder converts raw bytes to string (handles multi-byte chars).
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+
+      if (!reader) throw new Error("No reader available");
+
+      let done = false;
+
+      while (!done) {
+        const { value, done: streamDone } = await reader.read();
+        done = streamDone;
+
+        if (value) {
+          const text = decoder.decode(value, { stream: true });
+
+          // Parse SSE lines. Each line looks like: "data: some text\n\n"
+          const lines = text.split("\n");
+
+          for (const line of lines) {
+            if (line.startsWith("data: ") && line.trim() !== "data: [DONE]") {
+              const chunk = line.slice(6); // Remove "data: " prefix
+
+              // Update the LAST message (the assistant one we added above).
+              // Using functional setState to avoid stale closures —
+              // each update sees the latest state, not the state from when
+              // sendMessage was called.
+              setMessages((prev) => {
+                const updated = [...prev];
+                const lastMsg = updated[updated.length - 1];
+                updated[updated.length - 1] = {
+                  ...lastMsg,
+                  content: lastMsg.content + chunk,
+                };
+                return updated;
+              });
+            }
+          }
+        }
+      }
 
     } catch (err) {
       setError("Something went wrong. Please try again.");
@@ -149,7 +198,28 @@ export default function ChatPage({
               : "bg-gray-800 self-start"
               }`}
           >
-            {msg.content}
+            {msg.role === "assistant" ? (
+              <ReactMarkdown
+                components={{
+                  // Style markdown elements inside chat bubbles
+                  p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                  ul: ({ children }) => <ul className="list-disc ml-4 mb-2">{children}</ul>,
+                  ol: ({ children }) => <ol className="list-decimal ml-4 mb-2">{children}</ol>,
+                  li: ({ children }) => <li className="mb-1">{children}</li>,
+                  strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+                  code: ({ children }) => (
+                    <code className="bg-gray-900 px-1.5 py-0.5 rounded text-xs font-mono">{children}</code>
+                  ),
+                  pre: ({ children }) => (
+                    <pre className="bg-gray-900 p-3 rounded-lg overflow-x-auto my-2 text-xs">{children}</pre>
+                  ),
+                }}
+              >
+                {msg.content}
+              </ReactMarkdown>
+            ) : (
+              msg.content
+            )}
           </div>
         ))}
 
