@@ -22,6 +22,36 @@ router.post("/", requireAuth, async (req, res) => {
 
         );
 
+        const answer = response.data.answer;
+
+        // Save both messages to the database for chat history.
+        // We do this AFTER getting the AI response so:
+        // 1. The user's question and the AI answer are saved together
+        // 2. If the AI call fails, we don't save a question with no answer
+        //
+        // We use Promise.all to save both in parallel (faster).
+        // If saving fails, we log the error but still return the answer —
+        // a lost history entry is better than a failed chat response.
+        try {
+            await Promise.all([
+                axios.post(`${process.env.PYTHON_SERVICE_URL}/messages`, {
+                    document_id,
+                    user_id: userId,
+                    role: "user",
+                    content: question,
+                }),
+                axios.post(`${process.env.PYTHON_SERVICE_URL}/messages`, {
+                    document_id,
+                    user_id: userId,
+                    role: "assistant",
+                    content: answer,
+                }),
+            ]);
+        } catch (saveError) {
+            console.error("Failed to save messages:", saveError.message);
+            // Don't fail the chat response — user already got their answer
+        }
+
         return res.json(response.data);
 
     } catch (error) {
