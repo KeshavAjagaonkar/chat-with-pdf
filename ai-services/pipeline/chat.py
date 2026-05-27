@@ -35,19 +35,18 @@ def generate_answer_stream(question: str, context_chunks: list[str]):
     """
     Streaming: yields text chunks as Gemini generates them.
     
-    This is a Python generator function (uses `yield`).
-    Each chunk contains a small piece of the answer (usually a few words).
-    FastAPI's StreamingResponse can consume this directly.
+    Uses `generate_content_stream()` — the google-genai SDK's dedicated
+    streaming method. This returns an iterator where each item is a chunk
+    of the response as it's generated.
     
-    The `stream=True` parameter tells the Gemini SDK to return an iterator
-    instead of waiting for the complete response.
+    NOTE: Do NOT use generate_content(stream=True) — that parameter
+    doesn't exist in this SDK. The streaming method is separate.
     """
     prompt = _build_prompt(question, context_chunks)
 
-    response = client.models.generate_content(
+    response = client.models.generate_content_stream(
         model="gemini-2.5-flash",
-        contents=prompt,
-        stream=True
+        contents=prompt
     )
 
     for chunk in response:

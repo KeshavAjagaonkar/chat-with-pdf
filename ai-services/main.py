@@ -92,11 +92,17 @@ async def chat_stream(request: ChatRequest):
     relevant_chunks = search_similar_chunks(query_embedding, request.document_id)
 
     def stream_generator():
-        for chunk in generate_answer_stream(request.question, relevant_chunks):
-            # SSE format: each chunk is prefixed with "data: " and followed by two newlines
-            yield f"data: {chunk}\n\n"
-        # Signal end of stream
-        yield "data: [DONE]\n\n"
+        try:
+            for chunk in generate_answer_stream(request.question, relevant_chunks):
+                # SSE format: each chunk is prefixed with "data: " and followed by two newlines
+                yield f"data: {chunk}\n\n"
+            # Signal end of stream
+            yield "data: [DONE]\n\n"
+        except Exception as e:
+            # If Gemini is overloaded (503) or any error occurs,
+            # send the error as a chunk so the user sees it in the chat.
+            yield f"data: [Error: {str(e)}]\n\n"
+            yield "data: [DONE]\n\n"
 
     return StreamingResponse(
         stream_generator(),
