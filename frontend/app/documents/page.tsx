@@ -103,7 +103,7 @@ export default function DocumentsPage() {
         </div>
 
         <div className="flex items-center gap-4">
-          <a href="/"
+          <a href="/dashboard"
             className="text-sm text-gray-400 hover:text-white transition"
           >
             ← Upload new
@@ -144,7 +144,7 @@ export default function DocumentsPage() {
               No documents uploaded yet
             </p>
             <a
-              href="/"
+              href="/dashboard"
               className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-6 rounded-lg transition text-sm"
             >
               Upload your first PDF
