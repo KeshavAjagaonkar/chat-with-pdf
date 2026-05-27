@@ -26,7 +26,8 @@ app.add_middleware(
 class ChatRequest(BaseModel):
     question: str
     document_id: int
-    user_id: str = ""  # Optional — passed by Node backend for ownership checks
+    user_id: str = ""
+    chat_history: list = []  # Last N messages for conversation context
 
 # Pydantic model for message save requests.
 # BaseModel automatically validates that all fields are present
@@ -70,7 +71,7 @@ async def chat(request: ChatRequest):
 
     query_embedding = generate_query_embedding(request.question)
     relevant_chunks = search_similar_chunks(query_embedding, request.document_id)
-    answer = generate_answer(request.question, relevant_chunks)
+    answer = generate_answer(request.question, relevant_chunks, request.chat_history)
 
     return {
         "answer": answer,
@@ -93,14 +94,15 @@ async def chat_stream(request: ChatRequest):
 
     def stream_generator():
         try:
-            for chunk in generate_answer_stream(request.question, relevant_chunks):
-                # SSE format: each chunk is prefixed with "data: " and followed by two newlines
+            for chunk in generate_answer_stream(request.question, relevant_chunks, request.chat_history):
                 yield f"data: {chunk}\n\n"
-            # Signal end of stream
+            # Send source citations — the PDF chunks used to generate the answer.
+            # Format: chunks joined by ||| separator so the frontend can split them.
+            if relevant_chunks:
+                sources_str = "|||".join(relevant_chunks)
+                yield f"data: [SOURCES]{sources_str}\n\n"
             yield "data: [DONE]\n\n"
         except Exception as e:
-            # If Gemini is overloaded (503) or any error occurs,
-            # send the error as a chunk so the user sees it in the chat.
             yield f"data: [Error: {str(e)}]\n\n"
             yield "data: [DONE]\n\n"
 

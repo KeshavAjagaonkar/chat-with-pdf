@@ -65,7 +65,7 @@ router.post("/", requireAuth, async (req, res) => {
 // not axios (which buffers the full response).
 router.post("/stream", requireAuth, async (req, res) => {
     try {
-        const { question, document_id } = req.body;
+        const { question, document_id, chat_history } = req.body;
         const userId = req.userId;
 
         if (!question || !document_id) {
@@ -83,7 +83,7 @@ router.post("/stream", requireAuth, async (req, res) => {
         // instead of buffering the entire response in memory.
         const response = await axios.post(
             `${process.env.PYTHON_SERVICE_URL}/chat/stream`,
-            { question, document_id, user_id: userId },
+            { question, document_id, user_id: userId, chat_history: chat_history || [] },
             { responseType: "stream" }
         );
 
