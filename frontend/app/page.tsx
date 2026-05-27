@@ -127,9 +127,9 @@ export default function Home() {
 
         <a
           href="/documents"
-          className="text-sm text-gray-400 hover:text-white transition text-center"
+          className="bg-gray-900 rounded-xl p-4 text-sm text-gray-300 hover:text-white hover:bg-gray-800 transition text-center flex items-center justify-center gap-2"
         >
-          My Documents →
+          📄 My Documents →
         </a>
 
       </div>
