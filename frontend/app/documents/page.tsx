@@ -19,6 +19,7 @@ export default function DocumentsPage() {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [deleting, setDeleting] = useState<number | null>(null); // tracks which doc is being deleted
 
   // useEffect with [] runs once on mount — perfect for fetching data.
   // We define an async function inside because useEffect itself can't be async.
@@ -57,6 +58,36 @@ export default function DocumentsPage() {
       hour: "2-digit",
       minute: "2-digit",
     });
+  };
+
+  const deleteDocument = async (docId: number, filename: string) => {
+    // Simple confirmation — prevents accidental deletes.
+    if (!window.confirm(`Delete "${filename}"? This will also delete all chat history for this document.`)) {
+      return;
+    }
+
+    setDeleting(docId);
+
+    try {
+      const token = await getToken();
+
+      await axios.delete(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/documents/${docId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      // Remove from local state immediately (optimistic UI).
+      // No need to refetch the entire list from the server.
+      setDocuments((prev) => prev.filter((doc) => doc.id !== docId));
+    } catch (err) {
+      setError("Failed to delete document.");
+    } finally {
+      setDeleting(null);
+    }
   };
 
   return (
@@ -139,12 +170,28 @@ export default function DocumentsPage() {
                   </p>
                 </div>
 
-                <button
-                  onClick={() => router.push(`/chat/${doc.id}`)}
-                  className="ml-4 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded-lg transition shrink-0"
-                >
-                  Chat
-                </button>
+                <div className="flex items-center gap-2 ml-4 shrink-0">
+                  <button
+                    onClick={() => deleteDocument(doc.id, doc.filename)}
+                    disabled={deleting === doc.id}
+                    className="text-gray-500 hover:text-red-400 disabled:opacity-50 transition p-2 rounded-lg hover:bg-gray-800"
+                    title="Delete document"
+                  >
+                    {deleting === doc.id ? (
+                      <span className="text-xs">...</span>
+                    ) : (
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    )}
+                  </button>
+                  <button
+                    onClick={() => router.push(`/chat/${doc.id}`)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded-lg transition"
+                  >
+                    Chat
+                  </button>
+                </div>
               </div>
             ))}
           </div>
