@@ -129,7 +129,7 @@ export default function Home() {
           href="/documents"
           className="bg-gray-900 rounded-xl p-4 text-sm text-gray-300 hover:text-white hover:bg-gray-800 transition text-center flex items-center justify-center gap-2"
         >
-          📄 My Documents →
+          My Documents
         </a>
 
       </div>
