@@ -3,6 +3,8 @@ import cors from "cors";
 import dotenv from "dotenv";
 import uploadRoute from "./routes/upload.js";
 import chatRoute from "./routes/chat.js";
+import documentsRoute from "./routes/documents.js";
+import messagesRoute from "./routes/messages.js";
 
 dotenv.config();
 
@@ -16,6 +18,8 @@ app.use(express.json());
 
 app.use("/api/upload", uploadRoute);
 app.use("/api/chat", chatRoute);
+app.use("/api/documents", documentsRoute);
+app.use("/api/messages", messagesRoute);
 
 app.get("/health", (req, res) => {
     res.json({ status: "ok" });
