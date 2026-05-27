@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { use } from "react";
 import axios from "axios";
 import { UserButton, useAuth } from "@clerk/nextjs";
@@ -9,6 +9,7 @@ import ReactMarkdown from "react-markdown";
 interface Message {
   role: "user" | "assistant";
   content: string;
+  sources?: string[];
 }
 
 export default function ChatPage({
@@ -21,60 +22,65 @@ export default function ChatPage({
   const [messages, setMessages] = useState<Message[]>([]);
   const [question, setQuestion] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);
   const [loadingHistory, setLoadingHistory] = useState(true);
   const [error, setError] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  // Load chat history when the page opens.
-  // This runs once on mount (empty dependency array would cause issues
-  // with getToken, so we include it but getToken is stable across renders).
+  // Ref-based buffer for smooth streaming.
+  // Chunks accumulate in the ref WITHOUT triggering re-renders.
+  // A setInterval syncs the buffer to state at ~20fps (every 50ms).
+  const streamBufferRef = useRef("");
+
+  // Load chat history on mount
   useEffect(() => {
     const loadHistory = async () => {
       try {
         const token = await getToken();
-
         const response = await axios.get(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/messages`,
           {
             params: { document_id: documentId },
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+            headers: { Authorization: `Bearer ${token}` },
           }
         );
-
         setMessages(response.data.messages);
       } catch (err) {
-        // Don't show an error for history load failure —
-        // the user can still chat, they just won't see past messages.
         console.error("Failed to load chat history");
       } finally {
         setLoadingHistory(false);
       }
     };
-
     loadHistory();
   }, [documentId, getToken]);
 
+  // Auto-scroll to bottom when messages change
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const sendMessage = async () => {
+  const sendMessage = useCallback(async () => {
     if (!question.trim() || loading) return;
 
     const userMessage: Message = { role: "user", content: question };
     setMessages((prev) => [...prev, userMessage]);
     setQuestion("");
     setLoading(true);
+    setIsStreaming(true);
     setError("");
+    streamBufferRef.current = "";
 
     try {
       const token = await getToken();
 
-      // Use fetch() instead of axios for streaming.
-      // Axios buffers the full response — fetch gives us a ReadableStream
-      // that we can read chunk-by-chunk as data arrives from the server.
+      // Build chat_history from the last 6 messages (3 user-assistant pairs).
+      // This gives the LLM enough context for follow-ups without
+      // overwhelming the prompt with too much history.
+      const recentMessages = messages.slice(-6).map((m) => ({
+        role: m.role,
+        content: m.content,
+      }));
+
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/chat/stream`,
         {
@@ -86,27 +92,40 @@ export default function ChatPage({
           body: JSON.stringify({
             question: userMessage.content,
             document_id: parseInt(documentId),
+            chat_history: recentMessages,
           }),
         }
       );
 
-      if (!response.ok) {
-        throw new Error("Stream request failed");
-      }
+      if (!response.ok) throw new Error("Stream request failed");
 
-      // Add an empty assistant message to the UI immediately.
-      // We'll update its content as chunks arrive.
+      // Add empty assistant message that we'll fill via streaming
       setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
 
-      // Read the SSE stream.
-      // getReader() gives us a pull-based API to read chunks one at a time.
-      // TextDecoder converts raw bytes to string (handles multi-byte chars).
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
-
       if (!reader) throw new Error("No reader available");
 
+      // Sync buffer → state at 20fps (every 50ms).
+      // This is the key to smooth streaming: chunks accumulate in the ref
+      // instantly (no re-render), and the UI updates at a fixed rate.
+      const intervalId = setInterval(() => {
+        setMessages((prev) => {
+          const updated = [...prev];
+          const lastMsg = updated[updated.length - 1];
+          if (lastMsg && lastMsg.content !== streamBufferRef.current) {
+            updated[updated.length - 1] = {
+              ...lastMsg,
+              content: streamBufferRef.current,
+            };
+            return updated;
+          }
+          return prev; // No change — skip re-render
+        });
+      }, 50);
+
       let done = false;
+      let sourcesData: string[] = [];
 
       while (!done) {
         const { value, done: streamDone } = await reader.read();
@@ -114,38 +133,51 @@ export default function ChatPage({
 
         if (value) {
           const text = decoder.decode(value, { stream: true });
-
-          // Parse SSE lines. Each line looks like: "data: some text\n\n"
           const lines = text.split("\n");
 
           for (const line of lines) {
-            if (line.startsWith("data: ") && line.trim() !== "data: [DONE]") {
-              const chunk = line.slice(6); // Remove "data: " prefix
+            if (line.startsWith("data: ")) {
+              const data = line.slice(6);
 
-              // Update the LAST message (the assistant one we added above).
-              // Using functional setState to avoid stale closures —
-              // each update sees the latest state, not the state from when
-              // sendMessage was called.
-              setMessages((prev) => {
-                const updated = [...prev];
-                const lastMsg = updated[updated.length - 1];
-                updated[updated.length - 1] = {
-                  ...lastMsg,
-                  content: lastMsg.content + chunk,
-                };
-                return updated;
-              });
+              if (data === "[DONE]") {
+                // Stream complete
+              } else if (data.startsWith("[SOURCES]")) {
+                // Parse source citations
+                const raw = data.slice(9);
+                sourcesData = raw.split("|||").filter(Boolean);
+              } else if (data.startsWith("[Error:")) {
+                streamBufferRef.current += data;
+              } else {
+                // Normal text chunk — append to buffer (no re-render!)
+                streamBufferRef.current += data;
+              }
             }
           }
         }
       }
 
+      // Stream finished — do final sync and cleanup
+      clearInterval(intervalId);
+
+      // Final sync: ensure state matches the complete buffer
+      setMessages((prev) => {
+        const updated = [...prev];
+        const lastMsg = updated[updated.length - 1];
+        updated[updated.length - 1] = {
+          ...lastMsg,
+          content: streamBufferRef.current,
+          sources: sourcesData.length > 0 ? sourcesData : undefined,
+        };
+        return updated;
+      });
+
     } catch (err) {
       setError("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
+      setIsStreaming(false);
     }
-  };
+  }, [question, loading, messages, documentId, getToken]);
 
   return (
     <main className="min-h-screen flex flex-col bg-gray-950 text-white">
@@ -167,7 +199,7 @@ export default function ChatPage({
       </div>
 
       <div className="flex-1 overflow-y-auto px-6 py-6 flex flex-col gap-3">
-        {/* Show loading skeleton while fetching chat history */}
+        {/* Loading skeleton */}
         {loadingHistory && (
           <div className="flex flex-col gap-3 mt-4">
             {[1, 2].map((i) => (
@@ -183,47 +215,79 @@ export default function ChatPage({
           </div>
         )}
 
-        {/* Empty state — only show after history has loaded and there are truly no messages */}
+        {/* Empty state */}
         {!loadingHistory && messages.length === 0 && (
           <p className="text-gray-600 text-sm text-center mt-20">
             Ask anything about your PDF
           </p>
         )}
 
-        {messages.map((msg, i) => (
-          <div
-            key={i}
-            className={`max-w-xl px-4 py-3 rounded-xl text-sm leading-relaxed ${msg.role === "user"
-              ? "bg-blue-600 self-end"
-              : "bg-gray-800 self-start"
-              }`}
-          >
-            {msg.role === "assistant" ? (
-              <ReactMarkdown
-                components={{
-                  // Style markdown elements inside chat bubbles
-                  p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
-                  ul: ({ children }) => <ul className="list-disc ml-4 mb-2">{children}</ul>,
-                  ol: ({ children }) => <ol className="list-decimal ml-4 mb-2">{children}</ol>,
-                  li: ({ children }) => <li className="mb-1">{children}</li>,
-                  strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
-                  code: ({ children }) => (
-                    <code className="bg-gray-900 px-1.5 py-0.5 rounded text-xs font-mono">{children}</code>
-                  ),
-                  pre: ({ children }) => (
-                    <pre className="bg-gray-900 p-3 rounded-lg overflow-x-auto my-2 text-xs">{children}</pre>
-                  ),
-                }}
-              >
-                {msg.content}
-              </ReactMarkdown>
-            ) : (
-              msg.content
-            )}
-          </div>
-        ))}
+        {messages.map((msg, i) => {
+          // Is this the last message AND currently streaming?
+          const isCurrentlyStreaming = isStreaming && i === messages.length - 1 && msg.role === "assistant";
 
-        {loading && (
+          return (
+            <div key={i} className="flex flex-col gap-1">
+              <div
+                className={`max-w-xl px-4 py-3 rounded-xl text-sm leading-relaxed ${msg.role === "user"
+                  ? "bg-blue-600 self-end"
+                  : "bg-gray-800 self-start"
+                }`}
+              >
+                {msg.role === "assistant" ? (
+                  isCurrentlyStreaming ? (
+                    // During streaming: render plain text (fast, no markdown overhead)
+                    // Add blinking cursor ▌ for visual feedback
+                    <span className="whitespace-pre-wrap">
+                      {msg.content}
+                      <span className="animate-pulse text-blue-400">▌</span>
+                    </span>
+                  ) : (
+                    // After streaming: render with full markdown formatting
+                    <ReactMarkdown
+                      components={{
+                        p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                        ul: ({ children }) => <ul className="list-disc ml-4 mb-2">{children}</ul>,
+                        ol: ({ children }) => <ol className="list-decimal ml-4 mb-2">{children}</ol>,
+                        li: ({ children }) => <li className="mb-1">{children}</li>,
+                        strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+                        code: ({ children }) => (
+                          <code className="bg-gray-900 px-1.5 py-0.5 rounded text-xs font-mono">{children}</code>
+                        ),
+                        pre: ({ children }) => (
+                          <pre className="bg-gray-900 p-3 rounded-lg overflow-x-auto my-2 text-xs">{children}</pre>
+                        ),
+                      }}
+                    >
+                      {msg.content}
+                    </ReactMarkdown>
+                  )
+                ) : (
+                  msg.content
+                )}
+              </div>
+
+              {/* Source citations — shown below assistant messages */}
+              {msg.role === "assistant" && msg.sources && msg.sources.length > 0 && (
+                <details className="self-start max-w-xl mt-1">
+                  <summary className="text-xs text-gray-500 cursor-pointer hover:text-gray-300 transition px-2">
+                    📄 Sources ({msg.sources.length})
+                  </summary>
+                  <div className="mt-2 flex flex-col gap-2 px-2">
+                    {msg.sources.map((src, si) => (
+                      <div key={si} className="bg-gray-900 rounded-lg p-3 text-xs text-gray-400 leading-relaxed">
+                        {src.length > 300 ? src.slice(0, 300) + "..." : src}
+                      </div>
+                    ))}
+                  </div>
+                </details>
+              )}
+            </div>
+          );
+        })}
+
+        {/* Thinking indicator — shown when waiting for first chunk */}
+        {loading && !isStreaming && (
           <div className="bg-gray-800 self-start px-4 py-3 rounded-xl text-sm text-gray-400">
             Thinking...
           </div>
