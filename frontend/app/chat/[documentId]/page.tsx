@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { use } from "react";
 import axios from "axios";
-import { UserButton } from "@clerk/nextjs";
+import { UserButton, useAuth } from "@clerk/nextjs";
 
 interface Message {
   role: "user" | "assistant";
@@ -16,6 +16,7 @@ export default function ChatPage({
   params: Promise<{ documentId: string }>;
 }) {
   const { documentId } = use(params);
+  const { getToken } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [question, setQuestion] = useState("");
   const [loading, setLoading] = useState(false);
@@ -36,11 +37,18 @@ export default function ChatPage({
     setError("");
 
     try {
+      const token = await getToken();
+
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/chat`,
         {
           question: userMessage.content,
           document_id: parseInt(documentId),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
 
@@ -67,12 +75,14 @@ export default function ChatPage({
           <p className="text-gray-500 text-xs">Document #{documentId}</p>
         </div>
 
-        <a href="/"
-          className="text-sm text-gray-400 hover:text-white transition"
-        >
-          ← Upload new
-        </a>
-        <UserButton />
+        <div className="flex items-center gap-4">
+          <a href="/"
+            className="text-sm text-gray-400 hover:text-white transition"
+          >
+            ← Upload new
+          </a>
+          <UserButton />
+        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto px-6 py-6 flex flex-col gap-3">
@@ -86,8 +96,8 @@ export default function ChatPage({
           <div
             key={i}
             className={`max-w-xl px-4 py-3 rounded-xl text-sm leading-relaxed ${msg.role === "user"
-                ? "bg-blue-600 self-end"
-                : "bg-gray-800 self-start"
+              ? "bg-blue-600 self-end"
+              : "bg-gray-800 self-start"
               }`}
           >
             {msg.content}
