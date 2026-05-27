@@ -102,3 +102,53 @@ def fetch_messages(document_id: int, user_id: str) -> list[dict]:
         {"role": row[0], "content": row[1]}
         for row in rows
     ]
+
+
+def verify_document_owner(document_id: int, user_id: str) -> bool:
+    """
+    Checks if a document belongs to a specific user.
+    
+    Used to prevent User B from chatting with or deleting User A's document.
+    Returns True if the document exists AND belongs to the user, False otherwise.
+    
+    SELECT 1 is a performance trick — we don't need the actual data,
+    just whether a matching row exists. It's faster than SELECT *.
+    """
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "SELECT 1 FROM documents WHERE id = %s AND user_id = %s",
+        (document_id, user_id)
+    )
+
+    result = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+
+    return result is not None
+
+
+def delete_document(document_id: int):
+    """
+    Deletes a document and all associated data (messages + chunks).
+    
+    Deletion order matters because of foreign key constraints:
+    1. Delete messages (references documents.id)
+    2. Delete chunks (references documents.id)
+    3. Delete the document itself
+    
+    All three deletes happen in a single transaction (one conn.commit),
+    so if any step fails, nothing is deleted — all-or-nothing.
+    """
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("DELETE FROM messages WHERE document_id = %s", (document_id,))
+    cursor.execute("DELETE FROM chunks WHERE document_id = %s", (document_id,))
+    cursor.execute("DELETE FROM documents WHERE id = %s", (document_id,))
+
+    conn.commit()
+    cursor.close()
+    conn.close()
