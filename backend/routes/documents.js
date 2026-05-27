@@ -36,4 +36,30 @@ router.get("/", requireAuth, async (req, res) => {
     }
 });
 
+// DELETE /api/documents/:id
+// Deletes a specific document and all its associated data.
+// Uses URL param :id (REST convention for targeting a specific resource).
+// The Python service also verifies ownership — defense in depth.
+router.delete("/:id", requireAuth, async (req, res) => {
+    try {
+        const userId = req.userId;
+        const documentId = req.params.id;
+
+        const response = await axios.delete(
+            `${process.env.PYTHON_SERVICE_URL}/documents`,
+            { params: { document_id: documentId, user_id: userId } }
+        );
+
+        return res.json(response.data);
+
+    } catch (error) {
+        // Forward 403 from Python (ownership check failed)
+        if (error.response && error.response.status === 403) {
+            return res.status(403).json({ error: "You don't have access to this document" });
+        }
+        console.error("Document delete error:", error.message);
+        return res.status(500).json({ error: "Failed to delete document" });
+    }
+});
+
 export default router;
