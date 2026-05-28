@@ -79,7 +79,9 @@ def fetch_messages(document_id: int, user_id: str) -> list[dict]:
     
     SQL breakdown:
     - WHERE document_id = %s AND user_id = %s → scoped to this doc AND this user
-    - ORDER BY created_at ASC → oldest first, so chat reads top-to-bottom chronologically
+    - ORDER BY id ASC → oldest first, so chat reads top-to-bottom chronologically.
+      We use the auto-incrementing primary key 'id' instead of 'created_at' to
+      guarantee exact sequential order, preventing flips from identical timestamps.
     """
     conn = get_connection()
     cursor = conn.cursor()
@@ -88,7 +90,7 @@ def fetch_messages(document_id: int, user_id: str) -> list[dict]:
         """
         SELECT role, content FROM messages
         WHERE document_id = %s AND user_id = %s
-        ORDER BY created_at ASC
+        ORDER BY id ASC
         """,
         (document_id, user_id)
     )
