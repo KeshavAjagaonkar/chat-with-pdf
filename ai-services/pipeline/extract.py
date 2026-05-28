@@ -1,16 +1,45 @@
 import fitz
 
-def extract_text_from_pdf(pdf_path: str) -> str:
+
+def extract_text_from_pdf(pdf_path: str) -> list[dict]:
+    """
+    Extracts text from a PDF, preserving page boundaries.
+
+    Returns a list of page objects: [{"page": 1, "text": "..."}, ...]
+
+    Design decisions:
+    - Returns structured per-page data instead of a flat string so that
+      downstream chunking can track which page(s) each chunk spans.
+    - Empty pages are skipped (common in scanned PDFs with blank separator pages).
+    - Each page's text is stripped to remove leading/trailing whitespace
+      that PyMuPDF often includes from headers/footers/margins.
+    - Errors on individual pages are logged but don't abort the entire
+      extraction — a 100-page PDF shouldn't fail because page 47 has
+      a corrupt annotation.
+    """
     document = fitz.open(pdf_path)
-    
-    full_text = ""
-    
-    for page in document:
-        page_text = page.get_text()
-        full_text += page_text
-    
-    # print(full_text)
-    
+    pages = []
+
+    for page_num in range(len(document)):
+        try:
+            page = document[page_num]
+            text = page.get_text().strip()
+
+            # Skip empty pages — no useful content to chunk or embed.
+            # This is common in scanned PDFs with blank separator pages
+            # or PDFs with image-only pages (where get_text returns "").
+            if not text:
+                continue
+
+            pages.append({
+                "page": page_num + 1,  # 1-indexed for human readability
+                "text": text,
+            })
+        except Exception as e:
+            # Log but don't crash — partial extraction is better than none.
+            # A corrupt annotation on one page shouldn't kill the whole pipeline.
+            print(f"Warning: Failed to extract page {page_num + 1}: {e}")
+            continue
+
     document.close()
-    
-    return full_text
+    return pages
