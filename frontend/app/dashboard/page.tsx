@@ -26,6 +26,9 @@ export default function DashboardPage() {
   const [error, setError] = useState("");
   const [deleting, setDeleting] = useState<number | null>(null);
 
+  // Search filter query
+  const [searchQuery, setSearchQuery] = useState("");
+
   const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
   // Fetch documents on mount
@@ -129,124 +132,208 @@ export default function DashboardPage() {
     }
   };
 
+  // Real-time document filtering
+  const filteredDocuments = documents.filter((doc) =>
+    doc.filename.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
-    <main className="min-h-screen flex flex-col bg-gray-950 text-white">
+    <main className="min-h-screen flex flex-col bg-[#030303] text-neutral-300 relative selection:bg-emerald-500/20 selection:text-emerald-300">
+      
+      {/* Decorative radial gradients */}
+      <div className="absolute top-0 right-1/4 w-[500px] h-[300px] bg-emerald-500/5 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-10 left-1/4 w-[400px] h-[300px] bg-emerald-600/5 rounded-full blur-[110px] pointer-events-none" />
 
       {/* Header */}
-      <div className="border-b border-gray-800 px-6 py-4 flex items-center justify-between">
-        <div>
-          <h1 className="text-lg font-semibold">Dashboard</h1>
-          <p className="text-gray-500 text-xs">Upload & manage your PDFs</p>
+      <header className="sticky top-0 z-50 backdrop-blur-md bg-[#030303]/75 border-b border-neutral-900/60 px-6 py-4 flex items-center justify-between shrink-0">
+        <div className="flex items-center gap-3">
+          <a href="/" className="w-7 h-7 bg-gradient-to-tr from-emerald-500 to-emerald-400 rounded-lg flex items-center justify-center text-neutral-950 font-black tracking-tight text-xs shadow-md shadow-emerald-500/10">
+            P
+          </a>
+          <div>
+            <h1 className="text-sm font-semibold tracking-tight text-neutral-100 uppercase">Dashboard</h1>
+            <p className="text-neutral-500 text-[10px] uppercase tracking-wider">Ingest & Manage PDFs</p>
+          </div>
         </div>
-        <UserButton />
-      </div>
+        <div className="flex items-center gap-4">
+          <a
+            href="/"
+            className="text-xs text-neutral-500 hover:text-neutral-300 transition duration-300 font-medium"
+          >
+            ← Home
+          </a>
+          <UserButton />
+        </div>
+      </header>
 
-      <div className="flex-1 px-6 py-8">
+      {/* Content wrapper */}
+      <div className="flex-1 px-6 py-8 relative">
         <div className="max-w-2xl mx-auto flex flex-col gap-8">
 
-          {/* Upload section */}
-          <div className="bg-gray-900 rounded-2xl p-6 border border-gray-800">
-            <h2 className="text-sm font-semibold text-gray-300 mb-4 flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          {/* Upload Section (Sleek custom dotted zone) */}
+          <div className="bg-neutral-950/60 border border-neutral-900 rounded-2xl p-6 shadow-xl shadow-black/40 backdrop-blur-sm relative overflow-hidden group hover:border-neutral-800/80 transition duration-300">
+            
+            <h2 className="text-xs font-bold uppercase tracking-wider text-neutral-400 mb-4 flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
               </svg>
-              Upload a new PDF
+              Upload PDF Document
             </h2>
 
-            <div className="flex gap-3 items-start">
+            {/* Custom Styled Drag Zone Label */}
+            <div className="border border-dashed border-neutral-800 rounded-xl p-6 flex flex-col items-center justify-center bg-neutral-950/40 hover:bg-neutral-900/10 hover:border-emerald-500/20 transition-all duration-300 group cursor-pointer relative">
               <input
                 id="file-input"
                 type="file"
                 accept=".pdf"
                 onChange={handleFileChange}
-                className="flex-1 text-sm text-gray-300 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-gray-700 file:text-white hover:file:bg-gray-600 cursor-pointer"
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
               />
-              <button
-                onClick={handleUpload}
-                disabled={!file || uploading}
-                className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-medium py-2 px-5 rounded-lg transition text-sm shrink-0"
-              >
-                {uploading ? "Processing..." : "Upload"}
-              </button>
+              
+              <div className="w-10 h-10 bg-emerald-950/40 border border-emerald-900/20 text-emerald-400 rounded-full flex items-center justify-center mb-3 group-hover:scale-105 transition-all duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+                </svg>
+              </div>
+
+              <span className="text-xs text-neutral-300 font-semibold mb-1">Click to select PDF or drag it here</span>
+              <span className="text-[10px] text-neutral-600">Supports PDF format up to 10MB</span>
             </div>
 
+            {/* Ingest Action Buttons */}
             {file && (
-              <p className="text-green-400 text-xs mt-2">✓ {file.name}</p>
+              <div className="mt-4 flex items-center justify-between bg-neutral-900/40 border border-neutral-800/80 rounded-xl px-4 py-2 text-xs">
+                <div className="flex items-center gap-2 truncate pr-2">
+                  <span className="text-emerald-400">✓</span>
+                  <span className="text-neutral-200 font-medium truncate">{file.name}</span>
+                  <span className="text-neutral-600 text-[10px] shrink-0">({(file.size / (1024 * 1024)).toFixed(2)} MB)</span>
+                </div>
+                <button
+                  onClick={handleUpload}
+                  disabled={uploading}
+                  className="bg-emerald-500 hover:bg-emerald-400 text-neutral-950 font-bold px-4 py-1.5 rounded-lg transition text-[11px] uppercase tracking-wider shrink-0 disabled:bg-neutral-800 disabled:text-neutral-500 shadow shadow-emerald-500/10"
+                >
+                  {uploading ? "Parsing..." : "Ingest PDF"}
+                </button>
+              </div>
             )}
+
             {uploadError && (
-              <p className="text-red-400 text-xs mt-2">{uploadError}</p>
+              <p className="text-red-400/80 text-xs mt-3 bg-red-950/20 border border-red-900/20 px-3 py-1.5 rounded-lg">
+                {uploadError}
+              </p>
             )}
           </div>
 
-          {/* Documents section */}
-          <div>
-            <h2 className="text-sm font-semibold text-gray-300 mb-4 flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              Your Documents
-              {!loading && (
-                <span className="text-gray-600 font-normal">({documents.length})</span>
-              )}
-            </h2>
+          {/* Documents Section (With integrated real-time search) */}
+          <div className="flex flex-col gap-4">
+            
+            {/* Header + Search bar layout */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-neutral-900/60 pb-3">
+              <h2 className="text-xs font-bold uppercase tracking-wider text-neutral-400 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Your Documents
+                {!loading && (
+                  <span className="text-neutral-600 font-normal">({filteredDocuments.length})</span>
+                )}
+              </h2>
 
-            {/* Loading */}
+              {/* Dynamic search input field */}
+              {documents.length > 0 && (
+                <div className="relative w-full sm:w-60">
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search documents..."
+                    className="w-full bg-neutral-950/50 border border-neutral-900 hover:border-neutral-800 focus:border-neutral-700 rounded-xl px-3 py-1.5 pl-8 text-xs text-neutral-200 outline-none placeholder:text-neutral-600 transition"
+                  />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-3.5 w-3.5 text-neutral-600 absolute left-2.5 top-1/2 -translate-y-1/2"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
+              )}
+            </div>
+
+            {/* Loading Skeletons */}
             {loading && (
               <div className="flex flex-col gap-3">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="bg-gray-900 rounded-xl p-5 animate-pulse">
-                    <div className="h-4 bg-gray-800 rounded w-2/3 mb-3"></div>
-                    <div className="h-3 bg-gray-800 rounded w-1/3"></div>
+                  <div key={i} className="bg-neutral-950/40 border border-neutral-900/60 rounded-xl p-5 animate-pulse flex items-center justify-between">
+                    <div className="flex-1">
+                      <div className="h-3 bg-neutral-900 rounded w-2/3 mb-2.5"></div>
+                      <div className="h-2 bg-neutral-900 rounded w-1/3"></div>
+                    </div>
+                    <div className="h-7 bg-neutral-900 rounded w-16"></div>
                   </div>
                 ))}
               </div>
             )}
 
-            {/* Error */}
-            {error && <p className="text-red-400 text-sm text-center mt-8">{error}</p>}
+            {/* Error display */}
+            {error && <p className="text-red-400/80 text-xs text-center py-6 bg-red-950/10 border border-red-900/20 rounded-xl">{error}</p>}
 
             {/* Empty state */}
             {!loading && !error && documents.length === 0 && (
-              <div className="text-center py-12 text-gray-600 text-sm">
-                No documents yet. Upload your first PDF above!
+              <div className="text-center py-16 bg-neutral-950/30 border border-dashed border-neutral-900 rounded-2xl text-neutral-500 text-xs leading-relaxed">
+                No documents indexed yet. Upload and ingest your first PDF above!
+              </div>
+            )}
+
+            {/* Filtered empty state */}
+            {!loading && !error && documents.length > 0 && filteredDocuments.length === 0 && (
+              <div className="text-center py-16 bg-neutral-950/30 border border-dashed border-neutral-900 rounded-2xl text-neutral-500 text-xs leading-relaxed">
+                No documents match your search query &ldquo;{searchQuery}&rdquo;.
               </div>
             )}
 
             {/* Document list */}
-            {!loading && !error && documents.length > 0 && (
+            {!loading && !error && filteredDocuments.length > 0 && (
               <div className="flex flex-col gap-3">
-                {documents.map((doc) => (
+                {filteredDocuments.map((doc) => (
                   <div
                     key={doc.id}
-                    className="bg-gray-900 rounded-xl p-5 flex items-center justify-between hover:bg-gray-800/80 transition border border-gray-800/50"
+                    className="bg-neutral-950/40 border border-neutral-900/60 rounded-xl p-4.5 flex items-center justify-between hover:bg-neutral-950/80 hover:border-neutral-800 transition-all duration-300 group transform hover:scale-[1.005]"
                   >
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-white truncate">
+                    <div className="min-w-0 flex-1 pr-4">
+                      <p className="text-xs font-semibold text-neutral-200 truncate group-hover:text-neutral-100 transition">
                         {doc.filename}
                       </p>
-                      <p className="text-xs text-gray-500 mt-1">
-                        Uploaded {formatDate(doc.uploaded_at)}
+                      <p className="text-[10px] text-neutral-500 mt-1">
+                        Indexed {formatDate(doc.uploaded_at)}
                       </p>
                     </div>
 
-                    <div className="flex items-center gap-2 ml-4 shrink-0">
+                    <div className="flex items-center gap-3 shrink-0">
+                      {/* Delete doc icon button */}
                       <button
                         onClick={() => deleteDocument(doc.id, doc.filename)}
                         disabled={deleting === doc.id}
-                        className="text-gray-500 hover:text-red-400 disabled:opacity-50 transition p-2 rounded-lg hover:bg-gray-800"
+                        className="text-neutral-600 hover:text-red-400 disabled:opacity-30 transition p-2 rounded-lg hover:bg-neutral-900 border border-transparent hover:border-neutral-800/80"
                         title="Delete document"
                       >
                         {deleting === doc.id ? (
-                          <span className="text-xs">...</span>
+                          <span className="text-[10px] font-mono animate-pulse">...</span>
                         ) : (
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                           </svg>
                         )}
                       </button>
+
+                      {/* Chat action button */}
                       <button
                         onClick={() => router.push(`/chat/${doc.id}`)}
-                        className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded-lg transition"
+                        className="bg-emerald-500/10 hover:bg-emerald-500 text-emerald-400 hover:text-neutral-950 border border-emerald-500/20 hover:border-transparent text-xs font-bold py-1.5 px-4 rounded-lg transition duration-300 shadow shadow-emerald-500/5 hover:shadow-emerald-500/20"
                       >
                         Chat
                       </button>
