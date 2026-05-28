@@ -35,9 +35,11 @@ export default function LandingPage() {
       description: "Stop scrolling through hundreds of pages. Query lecture notes, dense textbooks, or journal articles and instantly generate clear study guides cited directly to the source page.",
       bulletPoints: ["Summarize lengthy thesis papers", "Generate test preps & flashcard outline", "Verify citations in seconds"],
       icon: (
-        <code className="text-[10px] font-mono font-bold text-[#d18a59] bg-[#121110] px-1.5 py-0.5 rounded border border-[#262322]">
-          [SYS.ACAD]
-        </code>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" className="h-5 w-5 text-[#c86a3e]" stroke="currentColor" strokeWidth={1.5} fill="none">
+          <path d="M128,32L24,80l104,48,104-48Z" fill="currentColor" className="fill-[#c86a3e]/10" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M64,98.5V160c0,26.5,28.7,48,64,48s64-21.5,64-48V98.5" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M224,80v64" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
       ),
       preview: {
         documentName: "biology_textbook_ch4.pdf",
@@ -49,14 +51,18 @@ export default function LandingPage() {
     },
     {
       category: "Legal & Business",
-      badge: "Reduce Auditing Time",
+      badge: "Reduce Auditing",
       title: "Extract clauses & analyze compliance",
       description: "Audit contracts, analyze service agreements, or review vendor compliance policies. Query key liabilities and let the AI direct you instantly to the precise paragraph in your contract.",
       bulletPoints: ["Pinpoint termination clauses", "Audit multi-page financial reports", "Cross-examine policy agreements"],
       icon: (
-        <code className="text-[10px] font-mono font-bold text-[#d18a59] bg-[#121110] px-1.5 py-0.5 rounded border border-[#262322]">
-          [SYS.CORP]
-        </code>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" className="h-5 w-5 text-[#c86a3e]" stroke="currentColor" strokeWidth={1.5} fill="none">
+          <path d="M128,32V208" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M80,208H176" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M56,72h144" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M56,72L32,136c0,13.3,10.7,24,24,24s24-10.7,24-24Z" fill="currentColor" className="fill-[#c86a3e]/10" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M200,72l-24,64c0,13.3,10.7,24,24,24s24-10.7,24-24Z" fill="currentColor" className="fill-[#c86a3e]/10" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
       ),
       preview: {
         documentName: "commercial_lease_agreement.pdf",
@@ -73,9 +79,11 @@ export default function LandingPage() {
       description: "Mine scientific journals, query technical component datasheets, or lookup system installation guidelines. Access precise facts and calculations without reading the full index.",
       bulletPoints: ["Locate specific hardware specs", "Scan international regulatory guides", "Verify chemical/structural formulas"],
       icon: (
-        <code className="text-[10px] font-mono font-bold text-[#d18a59] bg-[#121110] px-1.5 py-0.5 rounded border border-[#262322]">
-          [SYS.DATA]
-        </code>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" className="h-5 w-5 text-[#c86a3e]" stroke="currentColor" strokeWidth={1.5} fill="none">
+          <path d="M184,184l33.4,44.5A8,8,0,0,1,211,241H45a8,8,0,0,1-6.4-12.8L72,184Z" fill="currentColor" className="fill-[#c86a3e]/10" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M104,184V104H88V80h80v24H152v80" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M72,184H184" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
       ),
       preview: {
         documentName: "motor_controller_datasheet.pdf",
@@ -127,17 +135,17 @@ export default function LandingPage() {
   ];
 
   return (
-    <main className="min-h-screen bg-[#121110] bg-grid-pattern text-neutral-300 flex flex-col relative selection:bg-[#d18a59]/20 selection:text-neutral-100 overflow-x-hidden">
+    <main className="min-h-screen bg-[#121110] bg-grid-pattern text-neutral-300 flex flex-col relative selection:bg-[#c86a3e]/20 selection:text-neutral-100 overflow-x-hidden">
       
-      {/* Decorative Cozy Warm Ambient Glows (Muted Raw Copper/Amber) */}
-      <div className="absolute top-0 left-1/4 w-[600px] h-[350px] bg-[#d18a59]/3 rounded-full blur-[130px] pointer-events-none z-0" />
-      <div className="absolute top-1/3 right-1/4 w-[450px] h-[450px] bg-[#d18a59]/3 rounded-full blur-[140px] pointer-events-none z-0" />
-      <div className="absolute bottom-1/4 left-1/3 w-[500px] h-[350px] bg-[#d18a59]/2 rounded-full blur-[120px] pointer-events-none z-0" />
+      {/* Decorative Cozy Warm Ambient Glows (Emergent Rust & Sand Blurs) */}
+      <div className="absolute top-0 left-1/4 w-[600px] h-[350px] bg-[#c86a3e]/3 rounded-full blur-[130px] pointer-events-none z-0" />
+      <div className="absolute top-1/3 right-1/4 w-[450px] h-[450px] bg-[#c86a3e]/3 rounded-full blur-[140px] pointer-events-none z-0" />
+      <div className="absolute bottom-1/4 left-1/3 w-[500px] h-[350px] bg-[#c86a3e]/2 rounded-full blur-[120px] pointer-events-none z-0" />
 
-      {/* Frosted Glass Sticky Navigation (Charcoal background) */}
-      <nav className="sticky top-0 z-50 backdrop-blur-md bg-[#121110]/75 border-b border-[#262322] px-6 md:px-12 py-4 flex items-center justify-between shrink-0 transition-all duration-300">
+      {/* Frosted Glass Sticky Navigation (Sandstone/Cocoa borders) */}
+      <nav className="sticky top-0 z-50 backdrop-blur-md bg-[#121110]/75 border-b border-[#c8b9a6]/15 px-6 md:px-12 py-4 flex items-center justify-between shrink-0 transition-all duration-300">
         <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 bg-[#1a1817] border border-[#2a2624] rounded flex items-center justify-center text-[#d18a59] font-mono font-bold text-xs shadow-sm">
+          <div className="w-7 h-7 bg-[#1a1817] border border-[#c8b9a6]/20 rounded flex items-center justify-center text-[#c86a3e] font-mono font-bold text-xs shadow-sm">
             $
           </div>
           <span className="text-sm font-mono tracking-tight text-neutral-100 uppercase">doc-query</span>
@@ -163,14 +171,14 @@ export default function LandingPage() {
       <section className="flex flex-col items-center text-center px-6 pt-16 pb-12 md:pt-24 md:pb-16 max-w-4xl mx-auto shrink-0 relative z-10">
         
         {/* Technical Architecture Status Monospace Badge */}
-        <div className="inline-flex items-center gap-2 bg-[#1a1817] border border-[#2a2624] text-neutral-400 font-mono text-[10px] px-3.5 py-1.5 rounded-md mb-6 uppercase tracking-wider shadow-sm">
-          <span className="w-1.5 h-1.5 bg-[#d18a59] rounded-full"></span>
+        <div className="inline-flex items-center gap-2 bg-[#1a1817] border border-[#c8b9a6]/15 text-neutral-400 font-mono text-[10px] px-3.5 py-1.5 rounded-md mb-6 uppercase tracking-wider shadow-sm">
+          <span className="w-1.5 h-1.5 bg-[#c86a3e] rounded-full"></span>
           Ingestion Node: Active (PostgreSQL Vector + Gemini 2.5 Flash)
         </div>
 
         <h1 className="text-4xl md:text-6xl font-black max-w-4xl leading-tight tracking-tight text-neutral-100">
           Grounded PDF Q&A with{" "}
-          <span className="text-[#d18a59] font-mono block sm:inline">
+          <span className="text-[#c86a3e] font-mono block sm:inline">
             [page-level.attribution]
           </span>
         </h1>
@@ -190,7 +198,7 @@ export default function LandingPage() {
           
           <a
             href="/sign-in"
-            className="w-full sm:w-auto border border-[#2a2624] bg-[#1a1817]/40 hover:bg-[#1a1817] text-neutral-300 font-mono font-bold px-6 py-3.5 rounded-full transition duration-300 text-xs uppercase tracking-wider"
+            className="w-full sm:w-auto border border-[#c8b9a6]/20 bg-[#1a1817]/40 hover:bg-[#1a1817] text-neutral-300 font-mono font-bold px-6 py-3.5 rounded-full transition duration-300 text-xs uppercase tracking-wider"
           >
             View Dashboard
           </a>
@@ -199,19 +207,19 @@ export default function LandingPage() {
 
       {/* Sandbox Live Chat Preview Layout — Re-engineered as a Systems Inspection Console */}
       <section className="px-6 md:px-12 pb-20 max-w-5xl mx-auto w-full shrink-0 relative z-10">
-        <div className="bg-[#1a1817] border border-[#262322] rounded-2xl p-2 md:p-3 shadow-[0_0_80px_rgba(209,138,89,0.02)] relative group hover:border-[#2a2624] transition duration-500">
+        <div className="bg-[#1a1817] border border-[#c8b9a6]/15 rounded-2xl p-2 md:p-3 shadow-[0_0_80px_rgba(200,106,62,0.015)] relative group hover:border-[#c8b9a6]/25 transition duration-500">
           
           {/* Top sandbox bar */}
-          <div className="flex items-center justify-between px-3 py-2 border-b border-[#262322] mb-2 font-mono">
+          <div className="flex items-center justify-between px-3 py-2 border-b border-[#c8b9a6]/15 mb-2 font-mono">
             <div className="flex items-center gap-1.5">
-              <div className="w-2.5 h-2.5 rounded-full bg-[#262322]"></div>
-              <div className="w-2.5 h-2.5 rounded-full bg-[#262322]"></div>
-              <div className="w-2.5 h-2.5 rounded-full bg-[#262322]"></div>
+              <div className="w-2.5 h-2.5 rounded-full bg-[#1c1a19]"></div>
+              <div className="w-2.5 h-2.5 rounded-full bg-[#1c1a19]"></div>
+              <div className="w-2.5 h-2.5 rounded-full bg-[#1c1a19]"></div>
               <span className="text-[10px] text-neutral-600 ml-4">RAG_CLIENT_INSPECT_CONSOLE v2.4</span>
             </div>
             
-            <div className="flex items-center gap-2 bg-[#121110] border border-[#262322] px-2.5 py-0.5 rounded text-[9px] font-mono text-neutral-500">
-              <span className="w-1.5 h-1.5 bg-[#d18a59] rounded-full"></span>
+            <div className="flex items-center gap-2 bg-[#121110] border border-[#c8b9a6]/15 px-2.5 py-0.5 rounded text-[9px] font-mono text-neutral-500">
+              <span className="w-1.5 h-1.5 bg-[#c86a3e] rounded-full"></span>
               CLUSTER STATS: NORMAL
             </div>
           </div>
@@ -219,8 +227,8 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-12 gap-3 h-[420px] rounded-xl overflow-hidden text-xs font-mono bg-[#121110]">
             
             {/* Left Column (35%): SYSTEM REGISTRY TREE INDEX */}
-            <div className="hidden md:flex md:col-span-4 bg-[#121110] border-r border-[#262322] p-4 flex-col gap-4 overflow-hidden relative select-none">
-              <div className="border-b border-[#262322] pb-2 text-[10px] text-neutral-500 uppercase font-bold tracking-wider">
+            <div className="hidden md:flex md:col-span-4 bg-[#121110] border-r border-[#c8b9a6]/15 p-4 flex-col gap-4 overflow-hidden relative select-none">
+              <div className="border-b border-[#c8b9a6]/15 pb-2 text-[10px] text-neutral-500 uppercase font-bold tracking-wider">
                 DOCUMENT REGISTRY
               </div>
               <div className="flex-1 flex flex-col gap-3 font-mono text-[11px] text-neutral-400">
@@ -229,20 +237,20 @@ export default function LandingPage() {
                   <div className="pl-4 mt-2 space-y-1.5">
                     <div className="flex items-center justify-between hover:text-neutral-200 transition">
                       <span>📄 commercial_lease.pdf</span>
-                      <span className="text-[9px] text-[#d18a59] bg-[#1a1817] px-1 rounded border border-[#262322]">18p</span>
+                      <span className="text-[9px] text-[#c86a3e] bg-[#1a1817] px-1 rounded border border-[#c8b9a6]/15">18p</span>
                     </div>
                     <div className="flex items-center justify-between text-neutral-600">
                       <span>📄 system_spec_v4.pdf</span>
-                      <span className="text-[9px] bg-neutral-900 px-1 rounded">124p</span>
+                      <span className="text-[9px] bg-[#1a1817] px-1 rounded border border-[#c8b9a6]/10">124p</span>
                     </div>
                     <div className="flex items-center justify-between text-neutral-600">
                       <span>📄 biology_textbook.pdf</span>
-                      <span className="text-[9px] bg-neutral-900 px-1 rounded">68p</span>
+                      <span className="text-[9px] bg-[#1a1817] px-1 rounded border border-[#c8b9a6]/10">68p</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="mt-auto border-t border-[#262322] pt-3 text-[10px] text-neutral-500 space-y-1">
+                <div className="mt-auto border-t border-[#c8b9a6]/15 pt-3 text-[10px] text-neutral-500 space-y-1">
                   <div>VECTOR ENGINE: PGVECTOR</div>
                   <div>INDEX CAPACITY: 8.4 GB</div>
                   <div>LATEST EMBEDDING: COMPLETE</div>
@@ -252,7 +260,7 @@ export default function LandingPage() {
 
             {/* Right Column (65%): SIMULATED REAL-WORLD QUERY EXECUTION */}
             <div className="col-span-12 md:col-span-8 bg-[#121110] p-4 flex flex-col justify-between overflow-hidden">
-              <div className="border-b border-[#262322] pb-2 text-[10px] text-neutral-500 uppercase font-bold tracking-wider mb-3">
+              <div className="border-b border-[#c8b9a6]/15 pb-2 text-[10px] text-neutral-500 uppercase font-bold tracking-wider mb-3">
                 VECTOR QUERY EXECUTION LOG
               </div>
 
@@ -262,7 +270,7 @@ export default function LandingPage() {
                 {/* Console command input */}
                 <div>
                   <div className="text-neutral-500 text-[10px] mb-1">2026-05-29T00:48:37Z - [SYS.QUERY]</div>
-                  <div className="bg-[#1a1817] border border-[#262322] px-3.5 py-2.5 rounded-lg text-neutral-200 flex items-center justify-between">
+                  <div className="bg-[#1a1817] border border-[#c8b9a6]/15 px-3.5 py-2.5 rounded-lg text-neutral-200 flex items-center justify-between">
                     <span>$ doc-search --file-id commercial_lease.pdf --query &quot;What is the notice period for rent default?&quot;</span>
                   </div>
                 </div>
@@ -271,24 +279,24 @@ export default function LandingPage() {
                 <div className="space-y-1.5 text-neutral-500 font-mono text-[10px] pl-1">
                   <div>[SYS.LOAD] Loading embeddings for document_id: 81... done</div>
                   <div>[SYS.VEC] Generating 1536-dimensional query embedding vector... done</div>
-                  <div className="text-[#d18a59]">[SYS.MATH] Executing cosine similarity matrix scan... found 1 segment over similarity_threshold (0.842)</div>
+                  <div className="text-[#c86a3e]">[SYS.MATH] Executing cosine similarity matrix scan... found 1 segment over similarity_threshold (0.842)</div>
                 </div>
 
                 {/* Highlighted exact source segment match */}
-                <div className="bg-[#181615] border border-[#2a2624] rounded-xl p-3.5 relative overflow-hidden">
-                  <div className="flex items-center justify-between text-[9px] uppercase tracking-widest text-neutral-500 font-bold mb-1.5 border-b border-[#262322] pb-1.5">
+                <div className="bg-[#1a1817] border border-[#c8b9a6]/20 rounded-xl p-3.5 relative overflow-hidden">
+                  <div className="flex items-center justify-between text-[9px] uppercase tracking-widest text-neutral-500 font-bold mb-1.5 border-b border-[#c8b9a6]/15 pb-1.5">
                     <span>📄 segment extract match #24</span>
-                    <span className="text-[#d18a59] bg-[#d18a59]/10 border border-[#d18a59]/20 px-1.5 py-0.5 rounded font-mono">Page 14</span>
+                    <span className="text-[#c86a3e] bg-[#c86a3e]/10 border border-[#c86a3e]/20 px-1.5 py-0.5 rounded font-mono">Page 14</span>
                   </div>
-                  <p className="text-xs text-neutral-300 leading-relaxed italic font-mono bg-[#121110]/50 p-2 rounded-lg border border-[#262322]/40">
+                  <p className="text-xs text-neutral-300 leading-relaxed italic font-mono bg-[#121110]/50 p-2 rounded-lg border border-[#c8b9a6]/15">
                     &quot;...Landlord may terminate this lease upon 30 days prior written notice should Tenant fail to cure a rental default within 10 business days of initial notification...&quot;
                   </p>
                 </div>
 
                 {/* Strictly grounded attributed response output */}
                 <div>
-                  <div className="text-[#d18a59] text-[10px] mb-1">[SYS.RESPONSE] Strictly grounded in Page 14</div>
-                  <div className="bg-[#1a1817] border border-[#262322] p-3 rounded-lg text-neutral-200 leading-relaxed font-sans text-xs">
+                  <div className="text-[#c86a3e] text-[10px] mb-1">[SYS.RESPONSE] Strictly grounded in Page 14</div>
+                  <div className="bg-[#1a1817] border border-[#c8b9a6]/15 p-3 rounded-lg text-neutral-200 leading-relaxed font-sans text-xs">
                     The landlord can terminate the lease upon a **30-day written notice**, but only if you fail to cure the default within **10 business days** of receiving notice.
                   </div>
                 </div>
@@ -301,10 +309,10 @@ export default function LandingPage() {
       </section>
 
       {/* Targeted Audience Use Cases — Immersive Handcrafted Showcase Layout */}
-      <section className="px-6 md:px-12 py-16 md:py-24 max-w-6xl mx-auto relative z-10 border-t border-[#262322] w-full shrink-0">
+      <section className="px-6 md:px-12 py-16 md:py-24 max-w-6xl mx-auto relative z-10 border-t border-[#c8b9a6]/15 w-full shrink-0">
         
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <h2 className="text-xs font-bold text-[#d18a59] uppercase tracking-widest mb-3">Tailored Use Cases</h2>
+          <h2 className="text-xs font-bold text-[#c86a3e] uppercase tracking-widest mb-3">Tailored Use Cases</h2>
           <p className="text-2xl md:text-4xl font-black tracking-tight text-neutral-100 leading-tight">
             Designed for how you actually work
           </p>
@@ -326,17 +334,21 @@ export default function LandingPage() {
                   onClick={() => setActiveUseCase(i)}
                   className={`w-64 lg:w-full text-left p-5 rounded-2xl border transition-all duration-300 flex items-start gap-4 focus:outline-none shrink-0 select-none ${
                     isActive 
-                      ? "bg-[#1a1817] border-[#262322] shadow-[0_4px_20px_rgba(0,0,0,0.4)] translate-x-1" 
-                      : "bg-transparent border-transparent hover:bg-[#1a1817]/40 hover:border-[#262322]/40"
+                      ? "bg-[#1a1817] border-[#c8b9a6]/25 shadow-[0_4px_20px_rgba(0,0,0,0.4)] translate-x-1" 
+                      : "bg-transparent border-transparent hover:bg-[#1a1817]/40 hover:border-[#c8b9a6]/10"
                   }`}
                 >
-                  <div className="flex-shrink-0">
+                  <div className={`p-2.5 rounded-xl border transition duration-300 ${
+                    isActive 
+                      ? "bg-[#c86a3e]/10 border-[#c86a3e]/30 text-[#c86a3e]" 
+                      : "bg-[#1a1817] border-[#c8b9a6]/10 text-neutral-500"
+                  }`}>
                     {uc.icon}
                   </div>
                   
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2 mb-1">
-                      <span className={`text-[10px] font-mono font-bold uppercase tracking-wider ${isActive ? "text-[#d18a59]" : "text-neutral-500"}`}>
+                      <span className={`text-[10px] font-mono font-bold uppercase tracking-wider ${isActive ? "text-[#c86a3e]" : "text-neutral-500"}`}>
                         {uc.category}
                       </span>
                     </div>
@@ -348,16 +360,16 @@ export default function LandingPage() {
           </div>
 
           {/* Right: Immersive focused display card */}
-          <div className="lg:col-span-8 bg-[#1a1817] border border-[#262322] rounded-3xl p-6 md:p-8 flex flex-col justify-between shadow-[0_30px_70px_-15px_rgba(0,0,0,0.8)] relative overflow-hidden transition-all duration-500 min-h-[440px]">
+          <div className="lg:col-span-8 bg-[#1a1817] border border-[#c8b9a6]/15 rounded-3xl p-6 md:p-8 flex flex-col justify-between shadow-[0_30px_70px_-15px_rgba(0,0,0,0.8)] relative overflow-hidden transition-all duration-500 min-h-[440px]">
             {/* Ambient copper glow behind right display card */}
-            <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#d18a59]/5 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#c86a3e]/3 rounded-full blur-3xl pointer-events-none" />
 
             <div className="relative z-10 flex-1 flex flex-col">
               
               {/* Badge & Category Header */}
-              <div className="flex items-center justify-between pb-4 border-b border-[#262322]/60 mb-6 shrink-0">
-                <span className="text-xs font-bold text-[#d18a59] uppercase tracking-widest">{useCases[activeUseCase].category}</span>
-                <span className="text-[10px] bg-[#d18a59]/10 text-[#d18a59] px-3 py-1 rounded border border-[#d18a59]/25 font-bold uppercase tracking-wider">
+              <div className="flex items-center justify-between pb-4 border-b border-[#c8b9a6]/15 mb-6 shrink-0">
+                <span className="text-xs font-bold text-[#c86a3e] uppercase tracking-widest">{useCases[activeUseCase].category}</span>
+                <span className="text-[10px] bg-[#c86a3e]/10 text-[#c86a3e] px-3 py-1 rounded border border-[#c86a3e]/20 font-bold uppercase tracking-wider">
                   {useCases[activeUseCase].badge}
                 </span>
               </div>
@@ -371,29 +383,29 @@ export default function LandingPage() {
               </p>
 
               {/* Handcrafted Real-World Pipeline Preview */}
-              <div className="bg-[#121110] border border-[#262322] rounded-2xl p-4 mb-6 flex flex-col gap-3 font-sans relative overflow-hidden shrink-0">
+              <div className="bg-[#121110] border border-[#c8b9a6]/15 rounded-2xl p-4 mb-6 flex flex-col gap-3 font-sans relative overflow-hidden shrink-0">
                 
                 {/* PDF extract block */}
-                <div className="pb-3 border-b border-[#262322]/80 flex flex-col gap-1.5">
+                <div className="pb-3 border-b border-[#c8b9a6]/15 flex flex-col gap-1.5">
                   <div className="flex items-center justify-between text-[9px] uppercase tracking-widest text-neutral-500 font-bold font-mono">
                     <span>📄 Extracted {useCases[activeUseCase].preview.documentName}</span>
-                    <span className="text-[#d18a59] bg-[#d18a59]/10 border border-[#d18a59]/20 px-1.5 py-0.5 rounded font-mono">{useCases[activeUseCase].preview.page}</span>
+                    <span className="text-[#c86a3e] bg-[#c86a3e]/10 border border-[#c86a3e]/20 px-1.5 py-0.5 rounded font-mono">{useCases[activeUseCase].preview.page}</span>
                   </div>
-                  <p className="text-[11px] md:text-xs text-neutral-400 leading-relaxed italic bg-[#1a1817]/40 px-3 py-2 rounded-lg border border-[#262322]/40 font-mono">
+                  <p className="text-[11px] md:text-xs text-neutral-400 leading-relaxed italic bg-[#1a1817]/40 px-3 py-2 rounded-lg border border-[#c8b9a6]/15 font-mono">
                     {useCases[activeUseCase].preview.extractedText}
                   </p>
                 </div>
 
                 {/* AI Query & Cited Response block */}
                 <div className="flex flex-col gap-2.5">
-                  <div className="flex items-center gap-2 self-start bg-[#1a1817] px-3 py-1.5 rounded-full border border-[#262322] text-[11px] md:text-xs text-neutral-200 font-mono">
-                    <span className="w-1.5 h-1.5 bg-[#d18a59] rounded-full"></span>
+                  <div className="flex items-center gap-2 self-start bg-[#1a1817] px-3 py-1.5 rounded-full border border-[#c8b9a6]/15 text-[11px] md:text-xs text-neutral-200 font-mono">
+                    <span className="w-1.5 h-1.5 bg-[#c86a3e] rounded-full"></span>
                     <span><strong>Query:</strong> {useCases[activeUseCase].preview.userQuery}</span>
                   </div>
                   
                   <div className="flex gap-2 max-w-[95%]">
-                    <div className="w-4 h-4 rounded-full bg-[#121110] border border-[#262322] flex items-center justify-center shrink-0 mt-0.5">
-                      <div className="w-1.5 h-1.5 rounded-full bg-[#d18a59]"></div>
+                    <div className="w-4 h-4 rounded-full bg-[#121110] border border-[#c8b9a6]/15 flex items-center justify-center shrink-0 mt-0.5">
+                      <div className="w-1.5 h-1.5 rounded-full bg-[#c86a3e]"></div>
                     </div>
                     <p className="text-[11px] md:text-xs text-neutral-300 leading-relaxed">
                       <strong>Response:</strong> {useCases[activeUseCase].preview.assistantResponse.split("**").map((txt, ti) => 
@@ -408,14 +420,14 @@ export default function LandingPage() {
             </div>
 
             {/* Core Workflow Pillars (Bullet list) */}
-            <div className="relative z-10 border-t border-[#262322]/60 pt-5 mt-auto shrink-0">
+            <div className="relative z-10 border-t border-[#c8b9a6]/15 pt-5 mt-auto shrink-0">
               <div className="flex flex-wrap gap-2.5">
                 {useCases[activeUseCase].bulletPoints.map((bp, bidx) => (
                   <div 
                     key={bidx} 
-                    className="bg-[#121110] border border-[#262322] text-neutral-300 text-xs px-3.5 py-1.5 rounded-full flex items-center gap-2 font-medium"
+                    className="bg-[#121110] border border-[#c8b9a6]/15 text-neutral-300 text-xs px-3.5 py-1.5 rounded-full flex items-center gap-2 font-medium"
                   >
-                    <span className="w-1.5 h-1.5 bg-[#d18a59] rounded-full shrink-0"></span>
+                    <span className="w-1.5 h-1.5 bg-[#c86a3e] rounded-full shrink-0"></span>
                     <span>{bp}</span>
                   </div>
                 ))}
@@ -428,9 +440,9 @@ export default function LandingPage() {
       </section>
 
       {/* Step-by-Step Interactive Workflow */}
-      <section className="px-6 md:px-12 py-16 md:py-24 max-w-4xl mx-auto relative z-10 border-t border-[#262322] w-full shrink-0">
+      <section className="px-6 md:px-12 py-16 md:py-24 max-w-4xl mx-auto relative z-10 border-t border-[#c8b9a6]/15 w-full shrink-0">
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <h2 className="text-xs font-bold text-[#d18a59] uppercase tracking-widest mb-3">Vector Ingestion</h2>
+          <h2 className="text-xs font-bold text-[#c86a3e] uppercase tracking-widest mb-3">Vector Ingestion</h2>
           <p className="text-2xl md:text-3xl font-black tracking-tight text-neutral-100 leading-tight">
             How our pipeline compound works
           </p>
@@ -439,8 +451,8 @@ export default function LandingPage() {
         <div className="grid md:grid-cols-3 gap-6 relative">
           
           {/* Step 1 */}
-          <div className="bg-[#1a1817]/40 border border-[#262322] rounded-xl p-5 relative overflow-hidden flex flex-col gap-3">
-            <span className="text-[10px] bg-[#121110] text-[#d18a59] font-mono w-6 h-6 rounded-md flex items-center justify-center shrink-0 font-bold border border-[#262322]">01</span>
+          <div className="bg-[#1a1817]/40 border border-[#c8b9a6]/15 rounded-xl p-5 relative overflow-hidden flex flex-col gap-3">
+            <span className="text-[10px] bg-[#121110] text-[#c86a3e] font-mono w-6 h-6 rounded-md flex items-center justify-center shrink-0 font-bold border border-[#c8b9a6]/15">01</span>
             <h3 className="text-sm font-bold text-neutral-100 tracking-tight uppercase">Segmented Parsing</h3>
             <p className="text-xs md:text-sm text-neutral-400 leading-relaxed">
               We process your PDF on load, parsing exact page boundaries separately to prevent metadata loss during downstream chunking.
@@ -448,8 +460,8 @@ export default function LandingPage() {
           </div>
 
           {/* Step 2 */}
-          <div className="bg-[#1a1817]/40 border border-[#262322] rounded-xl p-5 relative overflow-hidden flex flex-col gap-3">
-            <span className="text-[10px] bg-[#121110] text-[#d18a59] font-mono w-6 h-6 rounded-md flex items-center justify-center shrink-0 font-bold border border-[#262322]">02</span>
+          <div className="bg-[#1a1817]/40 border border-[#c8b9a6]/15 rounded-xl p-5 relative overflow-hidden flex flex-col gap-3">
+            <span className="text-[10px] bg-[#121110] text-[#c86a3e] font-mono w-6 h-6 rounded-md flex items-center justify-center shrink-0 font-bold border border-[#c8b9a6]/15">02</span>
             <h3 className="text-sm font-bold text-neutral-100 tracking-tight uppercase">Multi-page Vectorization</h3>
             <p className="text-xs md:text-sm text-neutral-400 leading-relaxed">
               Words are vectorized into multi-dimensional embeddings, keeping structural metadata in Postgres JSONB stores.
@@ -457,8 +469,8 @@ export default function LandingPage() {
           </div>
 
           {/* Step 3 */}
-          <div className="bg-[#1a1817]/40 border border-[#262322] rounded-xl p-5 relative overflow-hidden flex flex-col gap-3">
-            <span className="text-[10px] bg-[#121110] text-[#d18a59] font-mono w-6 h-6 rounded-md flex items-center justify-center shrink-0 font-bold border border-[#262322]">03</span>
+          <div className="bg-[#1a1817]/40 border border-[#c8b9a6]/15 rounded-xl p-5 relative overflow-hidden flex flex-col gap-3">
+            <span className="text-[10px] bg-[#121110] text-[#c86a3e] font-mono w-6 h-6 rounded-md flex items-center justify-center shrink-0 font-bold border border-[#c8b9a6]/15">03</span>
             <h3 className="text-sm font-bold text-neutral-100 tracking-tight uppercase">Traceable Generation</h3>
             <p className="text-xs md:text-sm text-neutral-400 leading-relaxed">
               Gemini fetches overlapping vector chunks and returns clear bullet points carrying citation page badges for you to verify.
@@ -468,10 +480,10 @@ export default function LandingPage() {
       </section>
 
       {/* Interactive Accordion FAQs Section */}
-      <section className="px-6 md:px-12 py-16 md:py-24 max-w-3xl mx-auto relative z-10 border-t border-[#262322] w-full shrink-0">
+      <section className="px-6 md:px-12 py-16 md:py-24 max-w-3xl mx-auto relative z-10 border-t border-[#c8b9a6]/15 w-full shrink-0">
         
         <div className="text-center max-w-xl mx-auto mb-16">
-          <h2 className="text-xs font-bold text-[#d18a59] uppercase tracking-widest mb-3">Common Questions</h2>
+          <h2 className="text-xs font-bold text-[#c86a3e] uppercase tracking-widest mb-3">Common Questions</h2>
           <p className="text-2xl md:text-3xl font-black tracking-tight text-neutral-100 leading-tight">
             Frequently Asked Questions
           </p>
@@ -483,17 +495,17 @@ export default function LandingPage() {
             return (
               <div
                 key={idx}
-                className="bg-[#1a1817]/60 border border-[#262322] rounded-xl overflow-hidden transition-all duration-300"
+                className="bg-[#1a1817]/60 border border-[#c8b9a6]/15 rounded-xl overflow-hidden transition-all duration-300"
               >
                 {/* FAQ Question button */}
                 <button
                   onClick={() => setOpenFaq(isOpen ? null : idx)}
-                  className="w-full text-left px-5 py-4 flex items-center justify-between text-sm md:text-base font-bold text-neutral-200 tracking-tight hover:text-neutral-100 transition select-none outline-none focus:text-[#d18a59]"
+                  className="w-full text-left px-5 py-4 flex items-center justify-between text-sm md:text-base font-bold text-neutral-200 tracking-tight hover:text-neutral-100 transition select-none outline-none focus:text-[#c86a3e]"
                 >
                   <span>{faq.q}</span>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className={`h-4.5 w-4.5 text-neutral-600 transition-transform duration-300 ${isOpen ? "rotate-180 text-[#d18a59]" : ""}`}
+                    className={`h-4.5 w-4.5 text-neutral-600 transition-transform duration-300 ${isOpen ? "rotate-180 text-[#c86a3e]" : ""}`}
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -506,7 +518,7 @@ export default function LandingPage() {
                 {/* FAQ Answer with height transition */}
                 <div
                   className={`transition-all duration-300 ease-in-out ${
-                    isOpen ? "max-h-40 border-t border-[#262322]/60 opacity-100" : "max-h-0 opacity-0 pointer-events-none"
+                    isOpen ? "max-h-40 border-t border-[#c8b9a6]/15 opacity-100" : "max-h-0 opacity-0 pointer-events-none"
                   }`}
                 >
                   <p className="px-5 py-4 text-xs md:text-sm text-neutral-300 leading-relaxed">
@@ -520,7 +532,7 @@ export default function LandingPage() {
       </section>
 
       {/* Bottom Capsule Signup Prompt Section */}
-      <section className="px-6 md:px-12 py-16 md:py-24 text-center relative z-10 border-t border-[#262322] max-w-4xl mx-auto w-full shrink-0">
+      <section className="px-6 md:px-12 py-16 md:py-24 text-center relative z-10 border-t border-[#c8b9a6]/15 max-w-4xl mx-auto w-full shrink-0">
         <h2 className="text-3xl font-black text-neutral-100 tracking-tight leading-tight">
           Ready to save hours of reading?
         </h2>
@@ -538,7 +550,7 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-[#262322] px-6 py-8 text-center shrink-0 bg-[#121110]/60 relative z-10">
+      <footer className="border-t border-[#c8b9a6]/15 px-6 py-8 text-center shrink-0 bg-[#121110]/60 relative z-10">
         <p className="text-neutral-500 text-xs tracking-wider uppercase font-bold">
           Powered by Gemini Pro, Vector Ingest, and Next.js Framework
         </p>
