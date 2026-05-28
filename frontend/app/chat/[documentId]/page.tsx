@@ -6,11 +6,125 @@ import axios from "axios";
 import { UserButton, useAuth } from "@clerk/nextjs";
 import ReactMarkdown from "react-markdown";
 
+// ─── Type Contracts ───────────────────────────────────────────────────────────
+// Explicit types for the source data sent by the backend via SSE.
+// This matches the JSON format from Python's stream_generator:
+//   [{"text": "...", "pages": [1, 2]}, ...]
+
+interface Source {
+  text: string;
+  pages: number[];
+}
+
 interface Message {
   role: "user" | "assistant";
   content: string;
-  sources?: string[];
+  sources?: Source[];
 }
+
+// ─── Markdown Components ──────────────────────────────────────────────────────
+// Defined outside the component to avoid re-creating on every render.
+// Each component maps a markdown AST node to a styled React element.
+//
+// Design decisions:
+// - neutral-* scale (not gray-*) to avoid the blue tint in Tailwind's gray.
+// - emerald accents for interactive/highlighted elements — warm, not "AI blue".
+// - Generous spacing (mb-3, mt-4) for readability in chat context.
+// - Code blocks have a border to distinguish from the page background.
+// - Links open in new tab with noopener/noreferrer for security.
+
+const markdownComponents = {
+  h1: ({ children }: { children?: React.ReactNode }) => (
+    <h1 className="text-lg font-semibold text-neutral-100 mt-4 mb-2">
+      {children}
+    </h1>
+  ),
+  h2: ({ children }: { children?: React.ReactNode }) => (
+    <h2 className="text-base font-semibold text-neutral-100 mt-3 mb-2">
+      {children}
+    </h2>
+  ),
+  h3: ({ children }: { children?: React.ReactNode }) => (
+    <h3 className="text-sm font-semibold text-neutral-200 mt-3 mb-1">
+      {children}
+    </h3>
+  ),
+  p: ({ children }: { children?: React.ReactNode }) => (
+    <p className="mb-3 last:mb-0 leading-relaxed">{children}</p>
+  ),
+  ul: ({ children }: { children?: React.ReactNode }) => (
+    <ul className="list-disc pl-5 mb-3 space-y-1">{children}</ul>
+  ),
+  ol: ({ children }: { children?: React.ReactNode }) => (
+    <ol className="list-decimal pl-5 mb-3 space-y-1">{children}</ol>
+  ),
+  li: ({ children }: { children?: React.ReactNode }) => (
+    <li className="leading-relaxed">{children}</li>
+  ),
+  strong: ({ children }: { children?: React.ReactNode }) => (
+    <strong className="font-semibold text-neutral-100">{children}</strong>
+  ),
+  em: ({ children }: { children?: React.ReactNode }) => (
+    <em className="italic">{children}</em>
+  ),
+  blockquote: ({ children }: { children?: React.ReactNode }) => (
+    <blockquote className="border-l-2 border-emerald-600/50 pl-4 my-3 text-neutral-400 italic">
+      {children}
+    </blockquote>
+  ),
+  code: ({
+    children,
+    className,
+  }: {
+    children?: React.ReactNode;
+    className?: string;
+  }) => {
+    // className is set by ReactMarkdown for fenced code blocks (e.g., "language-python").
+    // Its presence distinguishes block code (inside <pre>) from inline code.
+    if (className) {
+      return (
+        <code className={`font-mono text-sm ${className}`}>{children}</code>
+      );
+    }
+    // Inline code — small, pill-shaped, distinct from surrounding text.
+    return (
+      <code className="bg-neutral-800 text-emerald-400 px-1.5 py-0.5 rounded text-sm font-mono">
+        {children}
+      </code>
+    );
+  },
+  pre: ({ children }: { children?: React.ReactNode }) => (
+    <pre className="bg-neutral-900 border border-neutral-800 p-4 rounded-lg overflow-x-auto my-3 text-sm">
+      {children}
+    </pre>
+  ),
+  hr: () => <hr className="border-neutral-800 my-4" />,
+  a: ({
+    href,
+    children,
+  }: {
+    href?: string;
+    children?: React.ReactNode;
+  }) => (
+    <a
+      href={href}
+      className="text-emerald-400 hover:text-emerald-300 underline underline-offset-2"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      {children}
+    </a>
+  ),
+};
+
+// ─── Helper: format page label from Source ─────────────────────────────────────
+function formatPageLabel(pages: number[]): string | null {
+  if (!pages || pages.length === 0) return null;
+  if (pages.length === 1) return `Page ${pages[0]}`;
+  return `Pages ${pages[0]}–${pages[pages.length - 1]}`;
+}
+
+// ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function ChatPage({
   params,
@@ -26,13 +140,14 @@ export default function ChatPage({
   const [loadingHistory, setLoadingHistory] = useState(true);
   const [error, setError] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // Ref-based buffer for smooth streaming.
   // Chunks accumulate in the ref WITHOUT triggering re-renders.
   // A setInterval syncs the buffer to state at ~20fps (every 50ms).
   const streamBufferRef = useRef("");
 
-  // Load chat history on mount
+  // ─── Load chat history on mount ──────────────────────────────────────────
   useEffect(() => {
     const loadHistory = async () => {
       try {
@@ -46,7 +161,7 @@ export default function ChatPage({
         );
         setMessages(response.data.messages);
       } catch (err) {
-        console.error("Failed to load chat history");
+        console.error("Failed to load chat history:", err);
       } finally {
         setLoadingHistory(false);
       }
@@ -54,11 +169,19 @@ export default function ChatPage({
     loadHistory();
   }, [documentId, getToken]);
 
-  // Auto-scroll to bottom when messages change
+  // ─── Auto-scroll to bottom when messages change ──────────────────────────
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // ─── Focus input after loading or sending ────────────────────────────────
+  useEffect(() => {
+    if (!loadingHistory && !loading) {
+      inputRef.current?.focus();
+    }
+  }, [loadingHistory, loading]);
+
+  // ─── Send message with streaming ─────────────────────────────────────────
   const sendMessage = useCallback(async () => {
     if (!question.trim() || loading) return;
 
@@ -66,7 +189,11 @@ export default function ChatPage({
     setMessages((prev) => [...prev, userMessage]);
     setQuestion("");
     setLoading(true);
-    setIsStreaming(true);
+    // IMPORTANT: Do NOT set isStreaming=true here.
+    // isStreaming should only be true when we're actually receiving chunks.
+    // The gap between loading=true and isStreaming=true is when the
+    // "Thinking..." indicator shows — while we wait for the first chunk.
+    setIsStreaming(false);
     setError("");
     streamBufferRef.current = "";
 
@@ -99,8 +226,10 @@ export default function ChatPage({
 
       if (!response.ok) throw new Error("Stream request failed");
 
-      // Add empty assistant message that we'll fill via streaming
+      // Add empty assistant message that we'll fill via streaming.
+      // NOW mark streaming as active since we're about to receive chunks.
       setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
+      setIsStreaming(true);
 
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
@@ -125,7 +254,7 @@ export default function ChatPage({
       }, 50);
 
       let done = false;
-      let sourcesData: string[] = [];
+      let sourcesData: Source[] = [];
 
       while (!done) {
         const { value, done: streamDone } = await reader.read();
@@ -140,11 +269,22 @@ export default function ChatPage({
               const data = line.slice(6);
 
               if (data === "[DONE]") {
-                // Stream complete
+                // Stream complete — handled after the loop
               } else if (data.startsWith("[SOURCES]")) {
-                // Parse source citations
+                // Parse source citations from JSON.
+                // Format: [SOURCES]<json_array>
                 const raw = data.slice(9);
-                sourcesData = raw.split("|||").filter(Boolean);
+                try {
+                  sourcesData = JSON.parse(raw) as Source[];
+                } catch {
+                  // Fallback for old format (|||−separated strings).
+                  // This handles the transition period where the backend
+                  // hasn't been redeployed yet but the frontend has.
+                  sourcesData = raw
+                    .split("|||")
+                    .filter(Boolean)
+                    .map((text) => ({ text, pages: [] }));
+                }
               } else if (data.startsWith("[Error:")) {
                 streamBufferRef.current += data;
               } else {
@@ -159,7 +299,7 @@ export default function ChatPage({
       // Stream finished — do final sync and cleanup
       clearInterval(intervalId);
 
-      // Final sync: ensure state matches the complete buffer
+      // Final sync: ensure state matches the complete buffer + attach sources.
       setMessages((prev) => {
         const updated = [...prev];
         const lastMsg = updated[updated.length - 1];
@@ -170,155 +310,287 @@ export default function ChatPage({
         };
         return updated;
       });
-
     } catch (err) {
       setError("Something went wrong. Please try again.");
+      // Clean up the empty assistant message if the stream failed
+      // before any content was received. Without this, users would see
+      // a ghost empty bubble after an error.
+      setMessages((prev) => {
+        const last = prev[prev.length - 1];
+        if (last && last.role === "assistant" && !last.content) {
+          return prev.slice(0, -1);
+        }
+        return prev;
+      });
     } finally {
       setLoading(false);
       setIsStreaming(false);
     }
   }, [question, loading, messages, documentId, getToken]);
 
-  return (
-    <main className="min-h-screen flex flex-col bg-gray-950 text-white">
+  // ─── Handle keyboard shortcuts ───────────────────────────────────────────
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  };
 
-      <div className="border-b border-gray-800 px-6 py-4 flex items-center justify-between">
-        <div>
-          <h1 className="text-lg font-semibold">Chat with PDF</h1>
-          <p className="text-gray-500 text-xs">Document #{documentId}</p>
+  // ─── Render ──────────────────────────────────────────────────────────────
+
+  return (
+    <main className="min-h-screen flex flex-col bg-neutral-950 text-neutral-300">
+      {/* ── Header ──────────────────────────────────────────────────────── */}
+      <header className="border-b border-neutral-800/60 px-6 py-4 flex items-center justify-between shrink-0">
+        <div className="flex items-center gap-3">
+          <div className="w-7 h-7 bg-neutral-800 rounded-lg flex items-center justify-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-3.5 w-3.5 text-neutral-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
+            </svg>
+          </div>
+          <div>
+            <h1 className="text-sm font-medium text-neutral-200">
+              Document Chat
+            </h1>
+            <p className="text-neutral-600 text-xs">ID {documentId}</p>
+          </div>
         </div>
 
         <div className="flex items-center gap-4">
-          <a href="/documents"
-            className="text-sm text-gray-400 hover:text-white transition"
+          <a
+            href="/documents"
+            className="text-xs text-neutral-500 hover:text-neutral-300 transition"
           >
-            ← My Documents
+            ← Documents
           </a>
           <UserButton />
         </div>
-      </div>
+      </header>
 
-      <div className="flex-1 overflow-y-auto px-6 py-6 flex flex-col gap-3">
-        {/* Loading skeleton */}
-        {loadingHistory && (
-          <div className="flex flex-col gap-3 mt-4">
-            {[1, 2].map((i) => (
-              <div
-                key={i}
-                className={`max-w-xl px-4 py-3 rounded-xl animate-pulse ${
-                  i % 2 === 1 ? "bg-blue-600/30 self-end" : "bg-gray-800 self-start"
-                }`}
-              >
-                <div className="h-3 bg-gray-700 rounded w-48"></div>
+      {/* ── Messages Area ───────────────────────────────────────────────── */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="max-w-3xl mx-auto px-6 py-6 flex flex-col gap-5">
+          {/* Loading skeleton */}
+          {loadingHistory && (
+            <div className="flex flex-col gap-4 mt-4">
+              {[1, 2].map((i) => (
+                <div
+                  key={i}
+                  className={`max-w-md px-4 py-3 rounded-2xl animate-pulse ${
+                    i % 2 === 1
+                      ? "bg-neutral-800/50 self-end"
+                      : "bg-neutral-900/50 self-start"
+                  }`}
+                >
+                  <div className="h-3 bg-neutral-800 rounded w-48"></div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Empty state */}
+          {!loadingHistory && messages.length === 0 && (
+            <div className="flex flex-col items-center justify-center mt-32 text-center">
+              <div className="w-12 h-12 rounded-2xl bg-neutral-900 border border-neutral-800 flex items-center justify-center mb-4">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5 text-neutral-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={1.5}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+                  />
+                </svg>
               </div>
-            ))}
-          </div>
-        )}
+              <p className="text-neutral-500 text-sm">
+                Ask anything about your document
+              </p>
+              <p className="text-neutral-700 text-xs mt-1">
+                Answers are generated from the PDF content with page citations
+              </p>
+            </div>
+          )}
 
-        {/* Empty state */}
-        {!loadingHistory && messages.length === 0 && (
-          <p className="text-gray-600 text-sm text-center mt-20">
-            Ask anything about your PDF
-          </p>
-        )}
+          {/* Message list */}
+          {messages.map((msg, i) => {
+            const isCurrentlyStreaming =
+              isStreaming && i === messages.length - 1 && msg.role === "assistant";
 
-        {messages.map((msg, i) => {
-          // Is this the last message AND currently streaming?
-          const isCurrentlyStreaming = isStreaming && i === messages.length - 1 && msg.role === "assistant";
-
-          return (
-            <div key={i} className="flex flex-col gap-1">
-              <div
-                className={`max-w-xl px-4 py-3 rounded-xl text-sm leading-relaxed ${msg.role === "user"
-                  ? "bg-blue-600 self-end"
-                  : "bg-gray-800 self-start"
-                }`}
-              >
-                {msg.role === "assistant" ? (
-                  isCurrentlyStreaming ? (
-                    // During streaming: render plain text (fast, no markdown overhead)
-                    // Add blinking cursor ▌ for visual feedback
-                    <span className="whitespace-pre-wrap">
+            return (
+              <div key={i} className="flex flex-col">
+                {msg.role === "user" ? (
+                  /* ── User Message ─────────────────────────────────── */
+                  <div className="flex justify-end">
+                    <div className="max-w-[75%] bg-neutral-800 text-neutral-100 rounded-2xl rounded-br-md px-4 py-3 text-sm leading-relaxed">
                       {msg.content}
-                      <span className="animate-pulse text-blue-400">▌</span>
-                    </span>
-                  ) : (
-                    // After streaming: render with full markdown formatting
-                    <ReactMarkdown
-                      components={{
-                        p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
-                        ul: ({ children }) => <ul className="list-disc ml-4 mb-2">{children}</ul>,
-                        ol: ({ children }) => <ol className="list-decimal ml-4 mb-2">{children}</ol>,
-                        li: ({ children }) => <li className="mb-1">{children}</li>,
-                        strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
-                        code: ({ children }) => (
-                          <code className="bg-gray-900 px-1.5 py-0.5 rounded text-xs font-mono">{children}</code>
-                        ),
-                        pre: ({ children }) => (
-                          <pre className="bg-gray-900 p-3 rounded-lg overflow-x-auto my-2 text-xs">{children}</pre>
-                        ),
-                      }}
-                    >
-                      {msg.content}
-                    </ReactMarkdown>
-                  )
+                    </div>
+                  </div>
                 ) : (
-                  msg.content
+                  /* ── Assistant Message ────────────────────────────── */
+                  <div className="flex gap-3 max-w-[85%]">
+                    {/* AI indicator dot */}
+                    <div className="w-6 h-6 rounded-full bg-emerald-950/60 border border-emerald-900/40 flex items-center justify-center shrink-0 mt-0.5">
+                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      {/* Render markdown for ALL states (streaming + final).
+                          This eliminates the jarring plain-text → formatted jump.
+                          ReactMarkdown at 20fps (~50ms intervals) handles typical
+                          chat messages well. For very long messages (>5000 chars),
+                          the 50ms sync interval naturally throttles re-renders. */}
+                      <div className="text-sm leading-relaxed text-neutral-300 prose-chat">
+                        <ReactMarkdown components={markdownComponents}>
+                          {msg.content}
+                        </ReactMarkdown>
+
+                        {/* Streaming cursor — thin blinking line.
+                            Uses CSS animation defined in globals.css.
+                            Only visible during active streaming, removed
+                            as soon as the stream completes. */}
+                        {isCurrentlyStreaming && (
+                          <span
+                            className="inline-block w-0.5 h-4 bg-emerald-500/70 rounded-full ml-0.5 align-middle cursor-blink"
+                          />
+                        )}
+                      </div>
+
+                      {/* ── Source Citations ──────────────────────────── */}
+                      {msg.sources && msg.sources.length > 0 && (
+                        <details className="mt-3 group">
+                          <summary className="text-xs text-neutral-600 hover:text-neutral-400 cursor-pointer flex items-center gap-1.5 select-none transition">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-3 w-3 transition-transform duration-200 group-open:rotate-90"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                              strokeWidth={2}
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M9 5l7 7-7 7"
+                              />
+                            </svg>
+                            {msg.sources.length} source
+                            {msg.sources.length !== 1 ? "s" : ""} referenced
+                          </summary>
+
+                          <div className="mt-2 space-y-2 pl-0.5">
+                            {msg.sources.map((src, si) => {
+                              const pageLabel = formatPageLabel(src.pages);
+                              return (
+                                <div
+                                  key={si}
+                                  className="bg-neutral-900/60 border border-neutral-800/40 rounded-lg p-3"
+                                >
+                                  <div className="flex items-center gap-2 mb-1.5">
+                                    {pageLabel && (
+                                      <span className="text-xs bg-emerald-950/50 text-emerald-400 px-2 py-0.5 rounded-md border border-emerald-900/30 font-medium">
+                                        {pageLabel}
+                                      </span>
+                                    )}
+                                    <span className="text-xs text-neutral-700">
+                                      Source {si + 1}
+                                    </span>
+                                  </div>
+                                  <p className="text-xs text-neutral-500 leading-relaxed">
+                                    {src.text.length > 300
+                                      ? src.text.slice(0, 300) + "…"
+                                      : src.text}
+                                  </p>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </details>
+                      )}
+                    </div>
+                  </div>
                 )}
               </div>
+            );
+          })}
 
-              {/* Source citations — shown below assistant messages */}
-              {msg.role === "assistant" && msg.sources && msg.sources.length > 0 && (
-                <details className="self-start max-w-xl mt-1">
-                  <summary className="text-xs text-gray-500 cursor-pointer hover:text-gray-300 transition px-2">
-                    📄 Sources ({msg.sources.length})
-                  </summary>
-                  <div className="mt-2 flex flex-col gap-2 px-2">
-                    {msg.sources.map((src, si) => (
-                      <div key={si} className="bg-gray-900 rounded-lg p-3 text-xs text-gray-400 leading-relaxed">
-                        {src.length > 300 ? src.slice(0, 300) + "..." : src}
-                      </div>
-                    ))}
-                  </div>
-                </details>
-              )}
+          {/* Thinking indicator — visible between request sent and first chunk received.
+              This only shows when loading=true AND isStreaming=false.
+              As soon as the first chunk arrives, isStreaming becomes true and this hides. */}
+          {loading && !isStreaming && (
+            <div className="flex gap-3 max-w-[85%]">
+              <div className="w-6 h-6 rounded-full bg-emerald-950/60 border border-emerald-900/40 flex items-center justify-center shrink-0">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+              </div>
+              <div className="flex items-center gap-1.5 text-sm text-neutral-600">
+                <span className="thinking-dots">Thinking</span>
+              </div>
             </div>
-          );
-        })}
+          )}
 
-        {/* Thinking indicator — shown when waiting for first chunk */}
-        {loading && !isStreaming && (
-          <div className="bg-gray-800 self-start px-4 py-3 rounded-xl text-sm text-gray-400">
-            Thinking...
-          </div>
-        )}
+          {/* Error message */}
+          {error && (
+            <div className="flex justify-center">
+              <p className="text-red-400/80 text-sm bg-red-950/20 border border-red-900/20 rounded-lg px-4 py-2">
+                {error}
+              </p>
+            </div>
+          )}
 
-        {error && (
-          <p className="text-red-400 text-sm text-center">{error}</p>
-        )}
-
-        <div ref={bottomRef} />
+          <div ref={bottomRef} />
+        </div>
       </div>
 
-      <div className="border-t border-gray-800 px-6 py-4 flex gap-3">
-        <input
-          type="text"
-          value={question}
-          onChange={(e) => setQuestion(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-          placeholder="Ask a question..."
-          disabled={loading}
-          className="flex-1 bg-gray-800 text-white rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-        />
-        <button
-          onClick={sendMessage}
-          disabled={loading || !question.trim()}
-          className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 disabled:cursor-not-allowed px-5 py-2.5 rounded-lg text-sm font-medium transition"
-        >
-          Send
-        </button>
+      {/* ── Input Area ──────────────────────────────────────────────────── */}
+      <div className="border-t border-neutral-800/60 px-6 py-4 shrink-0">
+        <div className="max-w-3xl mx-auto flex gap-3">
+          <input
+            ref={inputRef}
+            type="text"
+            value={question}
+            onChange={(e) => setQuestion(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Ask about your document…"
+            disabled={loading}
+            className="flex-1 bg-neutral-900 text-neutral-200 rounded-xl px-4 py-2.5 text-sm outline-none border border-neutral-800/60 focus:border-neutral-700 placeholder:text-neutral-600 disabled:opacity-40 transition"
+          />
+          <button
+            onClick={sendMessage}
+            disabled={loading || !question.trim()}
+            className="bg-neutral-200 hover:bg-white disabled:bg-neutral-800 disabled:text-neutral-600 text-neutral-900 px-4 py-2.5 rounded-xl text-sm font-medium transition disabled:cursor-not-allowed shrink-0"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M5 12h14M12 5l7 7-7 7"
+              />
+            </svg>
+          </button>
+        </div>
       </div>
-
     </main>
   );
 }
