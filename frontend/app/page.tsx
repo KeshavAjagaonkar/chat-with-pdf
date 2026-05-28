@@ -8,6 +8,7 @@ export default function LandingPage() {
   const { isSignedIn, isLoaded } = useAuth();
   const router = useRouter();
   const [activeStep, setActiveStep] = useState(0);
+  const [activeUseCase, setActiveUseCase] = useState(0);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   // If already signed in, redirect to dashboard
@@ -37,7 +38,14 @@ export default function LandingPage() {
         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
         </svg>
-      )
+      ),
+      preview: {
+        documentName: "biology_textbook_ch4.pdf",
+        page: "Page 48",
+        extractedText: "...the primary photochemical event in photosystem II is the light-induced transfer of an electron from the reaction center chlorophyll P680 to pheophytin...",
+        userQuery: "How does photosystem II initiate electron transfer?",
+        assistantResponse: "Electron transfer in photosystem II is initiated by the **light-induced transfer of an electron** from the reaction center chlorophyll **P680** to pheophytin."
+      }
     },
     {
       category: "Legal & Business",
@@ -49,7 +57,14 @@ export default function LandingPage() {
         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
         </svg>
-      )
+      ),
+      preview: {
+        documentName: "commercial_lease_agreement.pdf",
+        page: "Page 14",
+        extractedText: "...Landlord may terminate this lease upon 30 days prior written notice should Tenant fail to cure a rental default within 10 business days of initial notification...",
+        userQuery: "What is the notice period for lease termination due to rent default?",
+        assistantResponse: "The landlord can terminate the lease upon a **30-day written notice**, but only if you fail to cure the default within **10 business days** of receiving notice."
+      }
     },
     {
       category: "Researchers & Engineers",
@@ -61,7 +76,14 @@ export default function LandingPage() {
         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
         </svg>
-      )
+      ),
+      preview: {
+        documentName: "motor_controller_datasheet.pdf",
+        page: "Page 6",
+        extractedText: "...operational input voltage ranges from 12V to 48V DC with peak efficiency of 98.4% achieved at continuous 36V draw under 40°C thermal threshold...",
+        userQuery: "What is the peak operating efficiency and voltage?",
+        assistantResponse: "The controller reaches its peak efficiency of **98.4%** at a continuous draw of **36V DC** under a thermal limit of **40°C**."
+      }
     }
   ];
 
@@ -292,55 +314,134 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Targeted Audience Use Cases */}
+      {/* Targeted Audience Use Cases — Immersive Handcrafted Showcase Layout */}
       <section className="px-6 md:px-12 py-16 md:py-24 max-w-6xl mx-auto relative z-10 border-t border-[#262322] w-full shrink-0">
         
         <div className="text-center max-w-2xl mx-auto mb-16">
           <h2 className="text-xs font-bold text-orange-400 uppercase tracking-widest mb-3">Tailored Use Cases</h2>
-          <p className="text-2xl md:text-3xl font-black tracking-tight text-neutral-100 leading-tight">
+          <p className="text-2xl md:text-4xl font-black tracking-tight text-neutral-100 leading-tight">
             Designed for how you actually work
           </p>
-          <p className="text-neutral-500 text-xs mt-3 leading-relaxed">
-            Whether you are querying legal agreements, structural equations, or studying for finals, get accurate page-cites instantly.
+          <p className="text-neutral-400 text-sm md:text-base mt-4 leading-relaxed max-w-xl mx-auto">
+            Stop scanning lines page-by-page. Select your workflow below to see how our pipeline traces answers to the source.
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          {useCases.map((uc, i) => (
-            <div
-              key={i}
-              className="bg-[#1a1817]/40 border border-[#262322] rounded-2xl p-6 hover:border-orange-500/20 hover:bg-[#1a1817]/85 transition-all duration-300 flex flex-col justify-between group transform hover:scale-[1.005]"
-            >
-              <div>
-                <div className="flex items-center justify-between mb-4 pb-3 border-b border-[#262322]/40">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-8.5 h-8.5 bg-orange-950/40 border border-orange-900/20 text-orange-400 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-105 transition-all duration-300">
-                      {uc.icon}
-                    </div>
-                    <span className="text-xs font-bold text-neutral-200 uppercase tracking-tight">{uc.category}</span>
+        {/* Dynamic Multi-Layout Showcase Panel */}
+        <div className="grid lg:grid-cols-12 gap-8 items-stretch">
+          
+          {/* Left: Handwritten selectors */}
+          <div className="lg:col-span-4 flex flex-row lg:flex-col gap-3 overflow-x-auto pb-4 lg:pb-0 scrollbar-none shrink-0">
+            {useCases.map((uc, i) => {
+              const isActive = activeUseCase === i;
+              return (
+                <button
+                  key={i}
+                  onClick={() => setActiveUseCase(i)}
+                  className={`w-64 lg:w-full text-left p-5 rounded-2xl border transition-all duration-300 flex items-start gap-4 focus:outline-none shrink-0 select-none ${
+                    isActive 
+                      ? "bg-[#1a1817] border-[#262322] shadow-[0_4px_20px_rgba(0,0,0,0.4)] translate-x-1" 
+                      : "bg-transparent border-transparent hover:bg-[#1a1817]/40 hover:border-[#262322]/40"
+                  }`}
+                >
+                  <div className={`p-2.5 rounded-xl border transition duration-300 ${
+                    isActive 
+                      ? "bg-orange-950/60 border-orange-500/30 text-orange-400" 
+                      : "bg-[#1a1817] border-[#262322] text-neutral-500"
+                  }`}>
+                    {uc.icon}
                   </div>
-                  <span className="text-[9px] bg-orange-950/40 text-orange-400 px-2 py-0.5 rounded-full border border-orange-900/20 font-bold uppercase tracking-wider">
-                    {uc.badge}
-                  </span>
+                  
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <span className={`text-[10px] font-bold uppercase tracking-wider ${isActive ? "text-orange-400" : "text-neutral-500"}`}>
+                        {uc.category}
+                      </span>
+                    </div>
+                    <h3 className="text-xs font-bold text-neutral-200 line-clamp-1">{uc.title}</h3>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Right: Immersive focused display card */}
+          <div className="lg:col-span-8 bg-[#1a1817] border border-[#262322] rounded-3xl p-6 md:p-8 flex flex-col justify-between shadow-[0_30px_70px_-15px_rgba(0,0,0,0.8)] relative overflow-hidden transition-all duration-500 min-h-[440px]">
+            {/* Ambient amber glow behind right display card */}
+            <div className="absolute -top-16 -right-16 w-48 h-48 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
+
+            <div className="relative z-10 flex-1 flex flex-col">
+              
+              {/* Badge & Category Header */}
+              <div className="flex items-center justify-between pb-4 border-b border-[#262322]/60 mb-6 shrink-0">
+                <span className="text-xs font-bold text-orange-400 uppercase tracking-widest">{useCases[activeUseCase].category}</span>
+                <span className="text-[10px] bg-orange-950/60 text-orange-400 px-3 py-1 rounded-full border border-orange-900/30 font-bold uppercase tracking-wider">
+                  {useCases[activeUseCase].badge}
+                </span>
+              </div>
+
+              {/* Title & Large readable description */}
+              <h3 className="text-xl md:text-2xl font-black text-neutral-100 mb-4 leading-snug">
+                {useCases[activeUseCase].title}
+              </h3>
+              <p className="text-neutral-300 text-sm md:text-base leading-relaxed mb-6">
+                {useCases[activeUseCase].description}
+              </p>
+
+              {/* Handcrafted Real-World Pipeline Preview */}
+              <div className="bg-[#121110] border border-[#262322] rounded-2xl p-4 mb-6 flex flex-col gap-3 font-sans relative overflow-hidden shrink-0">
+                
+                {/* PDF extract block */}
+                <div className="pb-3 border-b border-[#262322]/80 flex flex-col gap-1.5">
+                  <div className="flex items-center justify-between text-[9px] uppercase tracking-widest text-neutral-500 font-bold font-mono">
+                    <span>📄 Extracted {useCases[activeUseCase].preview.documentName}</span>
+                    <span className="text-orange-400/80 bg-orange-950/40 px-1.5 py-0.5 rounded border border-orange-900/20">{useCases[activeUseCase].preview.page}</span>
+                  </div>
+                  <p className="text-[11px] md:text-xs text-neutral-400 leading-relaxed italic bg-[#1a1817]/40 px-3 py-2 rounded-lg border border-[#262322]/40 font-mono">
+                    {useCases[activeUseCase].preview.extractedText}
+                  </p>
                 </div>
 
-                <h3 className="text-sm font-bold text-neutral-100 mb-2 leading-tight group-hover:text-neutral-100 transition">{uc.title}</h3>
-                <p className="text-neutral-500 text-[11px] leading-relaxed mb-6">{uc.description}</p>
+                {/* AI Query & Cited Response block */}
+                <div className="flex flex-col gap-2.5">
+                  <div className="flex items-center gap-2 self-start bg-[#1a1817] px-3 py-1.5 rounded-full border border-[#262322] text-[11px] md:text-xs text-neutral-200">
+                    <span className="w-1.5 h-1.5 bg-orange-400 rounded-full"></span>
+                    <span><strong>Query:</strong> {useCases[activeUseCase].preview.userQuery}</span>
+                  </div>
+                  
+                  <div className="flex gap-2 max-w-[95%]">
+                    <div className="w-4 h-4 rounded-full bg-orange-950 border border-orange-900/40 flex items-center justify-center shrink-0 mt-0.5">
+                      <div className="w-1.5 h-1.5 rounded-full bg-orange-500"></div>
+                    </div>
+                    <p className="text-[11px] md:text-xs text-neutral-300 leading-relaxed">
+                      <strong>Response:</strong> {useCases[activeUseCase].preview.assistantResponse.split("**").map((txt, ti) => 
+                        ti % 2 === 1 ? <strong key={ti} className="text-neutral-100 font-semibold">{txt}</strong> : txt
+                      )}
+                    </p>
+                  </div>
+                </div>
+
               </div>
 
-              {/* Bullet details inside use-cases */}
-              <div className="bg-[#121110]/40 border border-[#262322]/60 rounded-xl p-3.5 mt-auto">
-                <ul className="space-y-2">
-                  {uc.bulletPoints.map((bp, bidx) => (
-                    <li key={bidx} className="flex items-center gap-2 text-[10px] text-neutral-400">
-                      <span className="w-1 h-1 rounded-full bg-orange-500 shrink-0"></span>
-                      {bp}
-                    </li>
-                  ))}
-                </ul>
+            </div>
+
+            {/* Core Workflow Pillars (Bullet list) */}
+            <div className="relative z-10 border-t border-[#262322]/60 pt-5 mt-auto shrink-0">
+              <div className="flex flex-wrap gap-2.5">
+                {useCases[activeUseCase].bulletPoints.map((bp, bidx) => (
+                  <div 
+                    key={bidx} 
+                    className="bg-[#121110] border border-[#262322] text-neutral-300 text-xs px-3.5 py-1.5 rounded-full flex items-center gap-2 font-medium"
+                  >
+                    <span className="w-1.5 h-1.5 bg-orange-500 rounded-full shrink-0"></span>
+                    <span>{bp}</span>
+                  </div>
+                ))}
               </div>
             </div>
-          ))}
+
+          </div>
+
         </div>
       </section>
 
@@ -358,8 +459,8 @@ export default function LandingPage() {
           {/* Step 1 */}
           <div className="bg-[#1a1817]/40 border border-[#262322] rounded-xl p-5 relative overflow-hidden flex flex-col gap-3">
             <span className="text-[10px] bg-[#121110] text-neutral-500 font-mono w-6 h-6 rounded-md flex items-center justify-center shrink-0 font-bold border border-[#262322]">01</span>
-            <h3 className="text-xs font-bold text-neutral-200 tracking-tight uppercase">Segmented Parsing</h3>
-            <p className="text-[11px] text-neutral-500 leading-relaxed">
+            <h3 className="text-sm font-bold text-neutral-100 tracking-tight uppercase">Segmented Parsing</h3>
+            <p className="text-xs md:text-sm text-neutral-400 leading-relaxed">
               We process your PDF on load, parsing exact page boundaries separately to prevent metadata loss during downstream chunking.
             </p>
           </div>
@@ -367,8 +468,8 @@ export default function LandingPage() {
           {/* Step 2 */}
           <div className="bg-[#1a1817]/40 border border-[#262322] rounded-xl p-5 relative overflow-hidden flex flex-col gap-3">
             <span className="text-[10px] bg-[#121110] text-neutral-500 font-mono w-6 h-6 rounded-md flex items-center justify-center shrink-0 font-bold border border-[#262322]">02</span>
-            <h3 className="text-xs font-bold text-neutral-200 tracking-tight uppercase">Multi-page Vectorization</h3>
-            <p className="text-[11px] text-neutral-500 leading-relaxed">
+            <h3 className="text-sm font-bold text-neutral-100 tracking-tight uppercase">Multi-page Vectorization</h3>
+            <p className="text-xs md:text-sm text-neutral-400 leading-relaxed">
               Words are vectorized into multi-dimensional embeddings, keeping structural metadata in Postgres JSONB stores.
             </p>
           </div>
@@ -376,8 +477,8 @@ export default function LandingPage() {
           {/* Step 3 */}
           <div className="bg-[#1a1817]/40 border border-[#262322] rounded-xl p-5 relative overflow-hidden flex flex-col gap-3">
             <span className="text-[10px] bg-[#121110] text-neutral-500 font-mono w-6 h-6 rounded-md flex items-center justify-center shrink-0 font-bold border border-[#262322]">03</span>
-            <h3 className="text-xs font-bold text-neutral-200 tracking-tight uppercase">Traceable Generation</h3>
-            <p className="text-[11px] text-neutral-500 leading-relaxed">
+            <h3 className="text-sm font-bold text-neutral-100 tracking-tight uppercase">Traceable Generation</h3>
+            <p className="text-xs md:text-sm text-neutral-400 leading-relaxed">
               Gemini fetches overlapping vector chunks and returns clear bullet points carrying citation page badges for you to verify.
             </p>
           </div>
@@ -405,7 +506,7 @@ export default function LandingPage() {
                 {/* FAQ Question button */}
                 <button
                   onClick={() => setOpenFaq(isOpen ? null : idx)}
-                  className="w-full text-left px-5 py-4 flex items-center justify-between text-xs font-bold text-neutral-200 tracking-tight uppercase hover:text-neutral-100 transition select-none outline-none focus:text-orange-400"
+                  className="w-full text-left px-5 py-4 flex items-center justify-between text-sm md:text-base font-bold text-neutral-200 tracking-tight hover:text-neutral-100 transition select-none outline-none focus:text-orange-400"
                 >
                   <span>{faq.q}</span>
                   <svg
@@ -426,7 +527,7 @@ export default function LandingPage() {
                     isOpen ? "max-h-40 border-t border-[#262322]/60 opacity-100" : "max-h-0 opacity-0 pointer-events-none"
                   }`}
                 >
-                  <p className="px-5 py-4 text-xs text-neutral-500 leading-relaxed">
+                  <p className="px-5 py-4 text-xs md:text-sm text-neutral-300 leading-relaxed">
                     {faq.a}
                   </p>
                 </div>
@@ -441,7 +542,7 @@ export default function LandingPage() {
         <h2 className="text-3xl font-black text-neutral-100 tracking-tight leading-tight">
           Ready to save hours of reading?
         </h2>
-        <p className="text-neutral-500 text-xs mt-3 max-w-md mx-auto leading-relaxed">
+        <p className="text-neutral-400 text-xs md:text-sm mt-3 max-w-md mx-auto leading-relaxed">
           Unlock, analyze, and query your research papers, financial reports, or structural specs immediately.
         </p>
         <div className="mt-8">
@@ -456,7 +557,7 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="border-t border-[#262322] px-6 py-8 text-center shrink-0 bg-[#121110]/60 relative z-10">
-        <p className="text-neutral-600 text-[10px] tracking-wider uppercase font-bold">
+        <p className="text-neutral-500 text-xs tracking-wider uppercase font-bold">
           Powered by Gemini Pro, Vector Ingest, and Next.js Framework
         </p>
       </footer>
