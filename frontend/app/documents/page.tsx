@@ -85,15 +85,15 @@ export default function DocumentsPage() {
   );
 
   return (
-    <main className="min-h-screen flex flex-col bg-[#030303] text-neutral-300 relative selection:bg-emerald-500/20 selection:text-emerald-300">
+    <main className="min-h-screen flex flex-col bg-[#121110] text-neutral-300 relative selection:bg-orange-500/20 selection:text-orange-300">
       
       {/* Decorative gradients */}
-      <div className="absolute top-0 right-1/4 w-[500px] h-[300px] bg-emerald-500/5 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute top-0 right-1/4 w-[500px] h-[300px] bg-orange-500/5 rounded-full blur-[100px] pointer-events-none" />
 
       {/* Header bar */}
-      <header className="sticky top-0 z-50 backdrop-blur-md bg-[#030303]/75 border-b border-neutral-900/60 px-6 py-4 flex items-center justify-between shrink-0">
+      <header className="sticky top-0 z-50 backdrop-blur-md bg-[#121110]/75 border-b border-[#262322] px-6 py-4 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
-          <a href="/" className="w-7 h-7 bg-gradient-to-tr from-emerald-500 to-emerald-400 rounded-lg flex items-center justify-center text-neutral-950 font-black tracking-tight text-xs shadow-md shadow-emerald-500/10">
+          <a href="/" className="w-7 h-7 bg-gradient-to-tr from-orange-500 to-amber-500 rounded-lg flex items-center justify-center text-neutral-950 font-black tracking-tight text-xs shadow-md shadow-orange-500/10">
             P
           </a>
           <div>
@@ -127,7 +127,7 @@ export default function DocumentsPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search through indexed PDFs..."
-                className="w-full bg-neutral-950/50 border border-neutral-900 hover:border-neutral-800 focus:border-neutral-700 rounded-xl px-4 py-2.5 pl-10 text-xs text-neutral-200 outline-none placeholder:text-neutral-600 transition"
+                className="w-full bg-[#1a1817]/50 border border-[#262322] hover:border-[#383330] focus:border-orange-500/30 rounded-full px-4 py-2.5 pl-10 text-xs text-neutral-200 outline-none placeholder:text-neutral-600 transition"
               />
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -148,7 +148,7 @@ export default function DocumentsPage() {
               {[1, 2, 3].map((i) => (
                 <div
                   key={i}
-                  className="bg-neutral-950/40 border border-neutral-900/60 rounded-xl p-5 animate-pulse"
+                  className="bg-[#1a1817]/40 border border-[#262322] rounded-xl p-5 animate-pulse"
                 >
                   <div className="h-3.5 bg-neutral-900 rounded w-2/3 mb-2.5"></div>
                   <div className="h-2 bg-neutral-900 rounded w-1/3"></div>
@@ -166,13 +166,13 @@ export default function DocumentsPage() {
 
           {/* Empty state */}
           {!loading && !error && documents.length === 0 && (
-            <div className="text-center py-16 bg-neutral-950/30 border border-dashed border-neutral-900 rounded-2xl flex flex-col items-center justify-center gap-4">
+            <div className="text-center py-16 bg-[#1a1817]/30 border border-dashed border-[#262322] rounded-2xl flex flex-col items-center justify-center gap-4">
               <p className="text-neutral-500 text-xs">
                 No documents uploaded yet
               </p>
               <a
                 href="/dashboard"
-                className="bg-emerald-500 hover:bg-emerald-400 text-neutral-950 text-[11px] uppercase tracking-wider font-bold py-2.5 px-6 rounded-lg transition duration-300 shadow shadow-emerald-500/10"
+                className="bg-[#ededed] hover:bg-white text-neutral-950 text-[11px] uppercase tracking-wider font-bold py-2.5 px-6 rounded-full transition duration-300 shadow shadow-black/10"
               >
                 Upload your first PDF
               </a>
@@ -181,7 +181,7 @@ export default function DocumentsPage() {
 
           {/* Filtered empty state */}
           {!loading && !error && documents.length > 0 && filteredDocuments.length === 0 && (
-            <div className="text-center py-16 bg-neutral-950/30 border border-dashed border-neutral-900 rounded-2xl text-neutral-500 text-xs">
+            <div className="text-center py-16 bg-[#1a1817]/30 border border-dashed border-[#262322] rounded-2xl text-neutral-500 text-xs">
               No documents match your query &ldquo;{searchQuery}&rdquo;.
             </div>
           )}
@@ -192,7 +192,7 @@ export default function DocumentsPage() {
               {filteredDocuments.map((doc) => (
                 <div
                   key={doc.id}
-                  className="bg-neutral-950/40 border border-neutral-900/60 rounded-xl p-4.5 flex items-center justify-between hover:bg-neutral-950/80 hover:border-neutral-800 transition-all duration-300 group transform hover:scale-[1.005]"
+                  className="bg-[#1a1817]/40 border border-[#262322] rounded-xl p-4.5 flex items-center justify-between hover:bg-[#1a1817]/80 hover:border-[#383330] transition-all duration-300 group transform hover:scale-[1.005]"
                 >
                   <div className="min-w-0 flex-1 pr-4">
                     <p className="text-xs font-semibold text-neutral-200 truncate group-hover:text-neutral-100 transition">
@@ -208,7 +208,7 @@ export default function DocumentsPage() {
                     <button
                       onClick={() => deleteDocument(doc.id, doc.filename)}
                       disabled={deleting === doc.id}
-                      className="text-neutral-600 hover:text-red-400 disabled:opacity-30 transition p-2 rounded-lg hover:bg-neutral-900 border border-transparent hover:border-neutral-800/80"
+                      className="text-neutral-600 hover:text-red-400 disabled:opacity-30 transition p-2 rounded-lg hover:bg-[#121110] border border-transparent hover:border-[#262322]"
                       title="Delete document"
                     >
                       {deleting === doc.id ? (
@@ -220,10 +220,10 @@ export default function DocumentsPage() {
                       )}
                     </button>
 
-                    {/* Chat button */}
+                    {/* Chat capsule button */}
                     <button
                       onClick={() => router.push(`/chat/${doc.id}`)}
-                      className="bg-emerald-500/10 hover:bg-emerald-500 text-emerald-400 hover:text-neutral-950 border border-emerald-500/20 hover:border-transparent text-xs font-bold py-1.5 px-4 rounded-lg transition duration-300 shadow shadow-emerald-500/5 hover:shadow-emerald-500/20"
+                      className="bg-orange-500/10 hover:bg-orange-500 text-orange-400 hover:text-neutral-950 border border-orange-500/20 hover:border-transparent text-xs font-bold py-1.5 px-5 rounded-full transition duration-300 shadow shadow-orange-500/5 hover:shadow-orange-500/20"
                     >
                       Chat
                     </button>

@@ -14,7 +14,7 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
+    --background: #121110;
     --foreground: #ededed;
   }
 }
@@ -54,13 +54,13 @@ body {
 }
 
 /* ── Premium SaaS Grid Pattern ──────────────────────────────────────────────
-   Uses a very subtle touch of emerald green (rgba(16,185,129,0.02)) for the grid lines.
-   This provides the background depth inspired by Linear, masterji.co, etc. */
+   Uses a very subtle touch of warm orange/amber (rgba(249,115,22,0.015)) for the grid lines.
+   This provides the warm background depth inspired by MasterJi. */
 .bg-grid-pattern {
   background-size: 40px 40px;
   background-image: 
-    linear-gradient(to right, rgba(16, 185, 129, 0.025) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(16, 185, 129, 0.025) 1px, transparent 1px);
+    linear-gradient(to right, rgba(249, 115, 22, 0.018) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(249, 115, 22, 0.018) 1px, transparent 1px);
 }
 
 /* ── Clerk High-Legibility Dark Theme Overrides ─────────────────────────────
@@ -69,8 +69,8 @@ body {
 .cl-card,
 .cl-signIn-start,
 .cl-signUp-start {
-  background-color: #09090b !important;
-  border: 1px solid #27272a !important;
+  background-color: #1a1817 !important;
+  border: 1px solid #262322 !important;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8) !important;
 }
 
@@ -85,14 +85,14 @@ body {
 }
 
 .cl-socialButtonsBlockButton {
-  background-color: #18181b !important;
-  border: 1px solid #27272a !important;
+  background-color: #121110 !important;
+  border: 1px solid #262322 !important;
   color: #e4e4e7 !important;
   transition: all 0.2s ease !important;
 }
 
 .cl-socialButtonsBlockButton:hover {
-  background-color: #27272a !important;
+  background-color: #262322 !important;
   color: #ffffff !important;
 }
 
@@ -102,11 +102,11 @@ body {
 }
 
 .cl-dividerLine {
-  background-color: #27272a !important;
+  background-color: #262322 !important;
 }
 
 .cl-dividerText {
-  color: #71717a !important;
+  color: #8b7e74 !important;
   font-size: 10px !important;
   font-weight: 700 !important;
   text-transform: uppercase !important;
@@ -119,20 +119,20 @@ body {
 }
 
 .cl-formFieldInput {
-  background-color: #18181b !important;
-  border: 1px solid #27272a !important;
+  background-color: #121110 !important;
+  border: 1px solid #262322 !important;
   color: #f4f4f5 !important;
   transition: all 0.2s ease !important;
 }
 
 .cl-formFieldInput:focus {
-  border-color: rgba(16, 185, 129, 0.5) !important;
-  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.1) !important;
+  border-color: rgba(249, 115, 22, 0.5) !important;
+  box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.1) !important;
 }
 
 .cl-formButtonPrimary {
-  background-color: #10b981 !important;
-  color: #09090b !important;
+  background-color: #f97316 !important;
+  color: #121110 !important;
   font-weight: 700 !important;
   text-transform: uppercase !important;
   letter-spacing: 0.05em !important;
@@ -140,7 +140,7 @@ body {
 }
 
 .cl-formButtonPrimary:hover {
-  background-color: #34d399 !important;
+  background-color: #ea580c !important;
   transform: translateY(-0.5px) !important;
 }
 
@@ -149,7 +149,7 @@ body {
 }
 
 .cl-footerActionLink {
-  color: #34d399 !important;
+  color: #f97316 !important;
   font-weight: 700 !important;
   text-decoration: underline !important;
   text-underline-offset: 4px !important;
@@ -157,16 +157,16 @@ body {
 }
 
 .cl-footerActionLink:hover {
-  color: #6ee7b7 !important;
+  color: #ea580c !important;
 }
 
 /* Ensure Google and other auth icon buttons have clean contrast */
 .cl-socialButtonsIconButton {
-  background-color: #18181b !important;
-  border: 1px solid #27272a !important;
+  background-color: #121110 !important;
+  border: 1px solid #262322 !important;
   color: #e4e4e7 !important;
 }
 
 .cl-socialButtonsIconButton:hover {
-  background-color: #27272a !important;
+  background-color: #262322 !important;
 }

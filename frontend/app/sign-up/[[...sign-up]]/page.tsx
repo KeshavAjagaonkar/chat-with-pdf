@@ -2,23 +2,23 @@ import { SignUp } from "@clerk/nextjs";
 
 export default function SignUpPage() {
   return (
-    <main className="min-h-screen grid lg:grid-cols-5 bg-[#030303] text-neutral-300 relative selection:bg-emerald-500/20 selection:text-emerald-300">
+    <main className="min-h-screen grid lg:grid-cols-5 bg-[#121110] text-neutral-300 relative selection:bg-orange-500/20 selection:text-orange-300">
       
-      {/* Decorative Blur blob */}
-      <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[350px] h-[350px] bg-emerald-500/5 rounded-full blur-[100px] pointer-events-none z-0" />
+      {/* Decorative Warm Blur blob */}
+      <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[350px] h-[350px] bg-orange-500/5 rounded-full blur-[100px] pointer-events-none z-0" />
 
-      {/* Left side: Premium Visual & Benefits Pane (60% width) */}
-      <section className="hidden lg:flex lg:col-span-3 bg-[#030303] bg-grid-pattern border-r border-neutral-900/60 p-12 flex-col justify-between relative overflow-hidden z-10">
+      {/* Left side: Cozy visual benefits pane */}
+      <section className="hidden lg:flex lg:col-span-3 bg-[#121110] bg-grid-pattern border-r border-[#262322] p-12 flex-col justify-between relative overflow-hidden z-10">
         
         {/* Top Logo branding */}
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 bg-gradient-to-tr from-emerald-500 to-emerald-400 rounded-lg flex items-center justify-center text-neutral-950 font-black tracking-tight text-sm shadow-md shadow-emerald-500/20">
+          <div className="w-8 h-8 bg-gradient-to-tr from-orange-500 to-amber-500 rounded-lg flex items-center justify-center text-neutral-950 font-black tracking-tight text-sm shadow-md shadow-orange-500/20">
             P
           </div>
-          <span className="text-sm font-semibold tracking-tight text-neutral-100 uppercase">ChatPDF</span>
+          <span className="text-sm font-bold tracking-tight text-neutral-100 uppercase">ChatPDF</span>
         </div>
 
-        {/* Core benefit cards list */}
+        {/* Cozy benefits list */}
         <div className="max-w-md flex flex-col gap-6 my-auto">
           <h2 className="text-3xl font-black text-neutral-100 tracking-tight leading-tight">
             Unlock the knowledge inside your documents
@@ -29,8 +29,8 @@ export default function SignUpPage() {
 
           <div className="flex flex-col gap-4 mt-4">
             {/* Benefit Item 1 */}
-            <div className="flex items-start gap-3 bg-neutral-950/60 border border-neutral-900/60 p-4 rounded-xl hover:border-emerald-500/10 transition duration-300">
-              <div className="w-8 h-8 rounded-lg bg-emerald-950/60 text-emerald-400 border border-emerald-900/30 flex items-center justify-center shrink-0">
+            <div className="flex items-start gap-3 bg-[#1a1817]/60 border border-[#262322] p-4 rounded-xl hover:border-orange-500/10 transition duration-300">
+              <div className="w-8 h-8 rounded-lg bg-orange-950/40 text-orange-400 border border-orange-900/25 flex items-center justify-center shrink-0">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
@@ -42,8 +42,8 @@ export default function SignUpPage() {
             </div>
 
             {/* Benefit Item 2 */}
-            <div className="flex items-start gap-3 bg-neutral-950/60 border border-neutral-900/60 p-4 rounded-xl hover:border-emerald-500/10 transition duration-300">
-              <div className="w-8 h-8 rounded-lg bg-emerald-950/60 text-emerald-400 border border-emerald-900/30 flex items-center justify-center shrink-0">
+            <div className="flex items-start gap-3 bg-[#1a1817]/60 border border-[#262322] p-4 rounded-xl hover:border-orange-500/10 transition duration-300">
+              <div className="w-8 h-8 rounded-lg bg-orange-950/40 text-orange-400 border border-orange-900/25 flex items-center justify-center shrink-0">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
@@ -55,8 +55,8 @@ export default function SignUpPage() {
             </div>
 
             {/* Benefit Item 3 */}
-            <div className="flex items-start gap-3 bg-neutral-950/60 border border-neutral-900/60 p-4 rounded-xl hover:border-emerald-500/10 transition duration-300">
-              <div className="w-8 h-8 rounded-lg bg-emerald-950/60 text-emerald-400 border border-emerald-900/30 flex items-center justify-center shrink-0">
+            <div className="flex items-start gap-3 bg-[#1a1817]/60 border border-[#262322] p-4 rounded-xl hover:border-orange-500/10 transition duration-300">
+              <div className="w-8 h-8 rounded-lg bg-orange-950/40 text-orange-400 border border-orange-900/25 flex items-center justify-center shrink-0">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
@@ -76,41 +76,41 @@ export default function SignUpPage() {
       </section>
 
       {/* Right side: Clean, High-Contrast Clerk Form (40% width) */}
-      <section className="col-span-5 lg:col-span-2 flex items-center justify-center p-6 relative overflow-hidden z-10">
+      <section className="col-span-5 lg:col-span-2 flex items-center justify-center p-6 relative overflow-hidden z-10 bg-[#121110]">
         
         {/* Extra mobile branding header */}
         <div className="absolute top-6 left-6 lg:hidden flex items-center gap-2">
-          <div className="w-6.5 h-6.5 bg-gradient-to-tr from-emerald-500 to-emerald-400 rounded flex items-center justify-center text-neutral-950 font-black text-xs">
+          <div className="w-6.5 h-6.5 bg-gradient-to-tr from-orange-500 to-amber-500 rounded flex items-center justify-center text-neutral-950 font-black text-xs">
             P
           </div>
           <span className="text-xs font-bold text-neutral-200 tracking-tight uppercase">ChatPDF</span>
         </div>
 
-        {/* Perfectly legible SignUp component */}
+        {/* Perfectly legible SignUp component overridden by custom CSS */}
         <SignUp
           appearance={{
             variables: {
-              colorPrimary: "#10b981", // emerald-500
-              colorBackground: "#09090b", // zinc-950
+              colorPrimary: "#f97316", // orange-500
+              colorBackground: "#1a1817", // warm dark-charcoal card
               colorText: "#f4f4f5", // zinc-100
               colorTextSecondary: "#d4d4d8", // zinc-300
-              colorInputBackground: "#18181b", // zinc-900
+              colorInputBackground: "#121110", // input base
               colorInputText: "#f4f4f5",
-              colorBorder: "#27272a", // zinc-800
+              colorBorder: "#262322", // warm border
             },
             elements: {
-              card: "bg-zinc-950/90 backdrop-blur-md border border-zinc-800/80 shadow-2xl shadow-black/95 rounded-2xl p-6",
+              card: "bg-[#1a1817] border border-[#262322] shadow-2xl rounded-2xl p-6",
               headerTitle: "text-zinc-100 font-bold tracking-tight text-lg",
               headerSubtitle: "text-zinc-400 text-xs",
-              socialButtonsIconButton: "bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-zinc-100 hover:text-white transition duration-300 rounded-xl",
-              socialButtonsBlockButton: "bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-zinc-200 hover:text-white transition duration-300 rounded-xl font-medium",
+              socialButtonsIconButton: "bg-[#121110] border border-[#262322] hover:bg-[#262322] text-zinc-100 transition duration-300 rounded-xl",
+              socialButtonsBlockButton: "bg-[#121110] border border-[#262322] hover:bg-[#262322] text-zinc-200 transition duration-300 rounded-xl font-medium",
               socialButtonsBlockButtonText: "text-zinc-200 font-semibold",
-              formButtonPrimary: "bg-emerald-500 hover:bg-emerald-400 text-neutral-950 font-bold text-xs uppercase tracking-wider rounded-xl py-2.5 transition duration-300 shadow-md shadow-emerald-500/10 hover:shadow-emerald-500/35",
+              formButtonPrimary: "bg-orange-500 hover:bg-orange-600 text-neutral-950 font-bold text-xs uppercase tracking-wider rounded-xl py-2.5 transition duration-300",
               footerActionText: "text-zinc-400 text-xs",
-              footerActionLink: "text-emerald-400 hover:text-emerald-300 font-bold underline underline-offset-4 transition",
+              footerActionLink: "text-orange-500 hover:text-orange-400 font-bold underline underline-offset-4 transition",
               formFieldLabel: "text-zinc-300 text-xs font-semibold",
-              formFieldInput: "bg-zinc-900 border border-zinc-800 text-zinc-100 rounded-xl focus:border-emerald-500/50 transition duration-300 py-2.5 px-3.5 outline-none placeholder:text-zinc-600",
-              dividerLine: "bg-zinc-800/80",
+              formFieldInput: "bg-[#121110] border border-[#262322] text-zinc-100 rounded-xl focus:border-orange-500/50 transition duration-300 py-2.5 px-3.5 outline-none placeholder:text-zinc-600",
+              dividerLine: "bg-[#262322]",
               dividerText: "text-zinc-500 uppercase text-[9px] tracking-widest font-bold",
             },
           }}

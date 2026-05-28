@@ -68,7 +68,7 @@ const markdownComponents = {
     <em className="italic">{children}</em>
   ),
   blockquote: ({ children }: { children?: React.ReactNode }) => (
-    <blockquote className="border-l-2 border-emerald-600/50 pl-4 my-3 text-neutral-400 italic">
+    <blockquote className="border-l-2 border-orange-500/50 pl-4 my-3 text-neutral-400 italic">
       {children}
     </blockquote>
   ),
@@ -88,17 +88,17 @@ const markdownComponents = {
     }
     // Inline code — small, pill-shaped, distinct from surrounding text.
     return (
-      <code className="bg-neutral-800 text-emerald-400 px-1.5 py-0.5 rounded text-sm font-mono">
+      <code className="bg-[#1a1817] text-orange-400 px-1.5 py-0.5 rounded text-sm font-mono border border-[#262322]">
         {children}
       </code>
     );
   },
   pre: ({ children }: { children?: React.ReactNode }) => (
-    <pre className="bg-neutral-900 border border-neutral-800 p-4 rounded-lg overflow-x-auto my-3 text-sm">
+    <pre className="bg-[#121110] border border-[#262322] p-4 rounded-lg overflow-x-auto my-3 text-sm">
       {children}
     </pre>
   ),
-  hr: () => <hr className="border-neutral-800 my-4" />,
+  hr: () => <hr className="border-[#262322] my-4" />,
   a: ({
     href,
     children,
@@ -108,7 +108,7 @@ const markdownComponents = {
   }) => (
     <a
       href={href}
-      className="text-emerald-400 hover:text-emerald-300 underline underline-offset-2"
+      className="text-orange-400 hover:text-orange-300 underline underline-offset-2"
       target="_blank"
       rel="noopener noreferrer"
     >
@@ -339,14 +339,14 @@ export default function ChatPage({
   // ─── Render ──────────────────────────────────────────────────────────────
 
   return (
-    <main className="min-h-screen flex flex-col bg-[#030303] text-neutral-300 selection:bg-emerald-500/20 selection:text-emerald-300">
+    <main className="min-h-screen flex flex-col bg-[#121110] bg-grid-pattern text-neutral-300 selection:bg-orange-500/20 selection:text-orange-300 relative">
       {/* Decorative gradients */}
-      <div className="absolute top-0 right-1/4 w-[400px] h-[200px] bg-emerald-500/5 rounded-full blur-[90px] pointer-events-none" />
+      <div className="absolute top-0 right-1/4 w-[400px] h-[200px] bg-orange-500/5 rounded-full blur-[90px] pointer-events-none" />
 
       {/* ── Header ──────────────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-50 backdrop-blur-md bg-[#030303]/75 border-b border-neutral-900/60 px-6 py-4 flex items-center justify-between shrink-0">
+      <header className="sticky top-0 z-50 backdrop-blur-md bg-[#121110]/75 border-b border-[#262322] px-6 py-4 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
-          <div className="w-7 h-7 bg-gradient-to-tr from-emerald-500 to-emerald-400 rounded-lg flex items-center justify-center text-neutral-950 font-black tracking-tight text-xs shadow-md shadow-emerald-500/10">
+          <div className="w-7 h-7 bg-gradient-to-tr from-orange-500 to-amber-400 rounded-lg flex items-center justify-center text-neutral-950 font-black tracking-tight text-xs shadow-md shadow-orange-500/10">
             P
           </div>
           <div>
@@ -369,7 +369,7 @@ export default function ChatPage({
       </header>
 
       {/* ── Messages Area ───────────────────────────────────────────────── */}
-      <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-neutral-800/80 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-neutral-700/80">
+      <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[#262322] [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-[#3e3937]">
         <div className="max-w-3xl mx-auto px-6 py-6 flex flex-col gap-5">
           {/* Loading skeleton */}
           {loadingHistory && (
@@ -379,11 +379,11 @@ export default function ChatPage({
                   key={i}
                   className={`max-w-md px-4 py-3 rounded-2xl animate-pulse ${
                     i % 2 === 1
-                      ? "bg-neutral-900/50 border border-neutral-900/30 self-end"
-                      : "bg-neutral-950/40 border border-neutral-900/30 self-start"
+                      ? "bg-[#1a1817]/50 border border-[#262322]/50 self-end"
+                      : "bg-[#121110]/40 border border-[#262322]/40 self-start"
                   }`}
                 >
-                  <div className="h-3 bg-neutral-900 rounded w-48"></div>
+                  <div className="h-3 bg-[#262322] rounded w-48"></div>
                 </div>
               ))}
             </div>
@@ -392,10 +392,10 @@ export default function ChatPage({
           {/* Empty state */}
           {!loadingHistory && messages.length === 0 && (
             <div className="flex flex-col items-center justify-center mt-32 text-center">
-              <div className="w-12 h-12 rounded-2xl bg-neutral-950 border border-neutral-900 flex items-center justify-center mb-4">
+              <div className="w-12 h-12 rounded-2xl bg-[#1a1817] border border-[#262322] flex items-center justify-center mb-4 text-orange-400/50">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 text-neutral-600"
+                  className="h-5 w-5"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -427,7 +427,7 @@ export default function ChatPage({
                 {msg.role === "user" ? (
                   /* ── User Message ─────────────────────────────────── */
                   <div className="flex justify-end">
-                    <div className="max-w-[75%] bg-neutral-900 border border-neutral-800/80 text-neutral-100 rounded-2xl rounded-br-md px-4 py-3 text-sm leading-relaxed">
+                    <div className="max-w-[75%] bg-[#1a1817] border border-[#262322] text-neutral-100 rounded-2xl rounded-br-md px-4 py-3 text-sm leading-relaxed">
                       {msg.content}
                     </div>
                   </div>
@@ -435,8 +435,8 @@ export default function ChatPage({
                   /* ── Assistant Message ────────────────────────────── */
                   <div className="flex gap-3 max-w-[85%]">
                     {/* AI indicator dot */}
-                    <div className="w-6 h-6 rounded-full bg-emerald-950/60 border border-emerald-900/40 flex items-center justify-center shrink-0 mt-0.5">
-                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
+                    <div className="w-6 h-6 rounded-full bg-orange-950/60 border border-orange-900/40 flex items-center justify-center shrink-0 mt-0.5">
+                      <div className="w-1.5 h-1.5 rounded-full bg-orange-500"></div>
                     </div>
 
                     <div className="flex-1 min-w-0">
@@ -449,7 +449,7 @@ export default function ChatPage({
                         {/* Streaming cursor — thin blinking line. */}
                         {isCurrentlyStreaming && (
                           <span
-                            className="inline-block w-0.5 h-4 bg-emerald-500/70 rounded-full ml-0.5 align-middle cursor-blink"
+                            className="inline-block w-0.5 h-4 bg-orange-500/70 rounded-full ml-0.5 align-middle cursor-blink"
                           />
                         )}
                       </div>
@@ -457,7 +457,7 @@ export default function ChatPage({
                       {/* ── Source Citations ──────────────────────────── */}
                       {msg.sources && msg.sources.length > 0 && (
                         <details className="mt-3 group">
-                          <summary className="text-xs text-neutral-600 hover:text-neutral-400 cursor-pointer flex items-center gap-1.5 select-none transition">
+                          <summary className="text-xs text-neutral-600 hover:text-orange-400 cursor-pointer flex items-center gap-1.5 select-none transition">
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
                               className="h-3 w-3 transition-transform duration-200 group-open:rotate-90"
@@ -482,11 +482,11 @@ export default function ChatPage({
                               return (
                                 <div
                                   key={si}
-                                  className="bg-neutral-950/60 border border-neutral-900/60 rounded-lg p-3"
+                                  className="bg-[#121110] border border-[#262322] rounded-xl p-3"
                                 >
                                   <div className="flex items-center gap-2 mb-1.5">
                                     {pageLabel && (
-                                      <span className="text-[10px] bg-emerald-950/50 text-emerald-400 px-2 py-0.5 rounded-md border border-emerald-900/30 font-semibold uppercase tracking-wider">
+                                      <span className="text-[10px] bg-orange-950/50 text-orange-400 px-2 py-0.5 rounded-md border border-orange-900/30 font-semibold uppercase tracking-wider">
                                         {pageLabel}
                                       </span>
                                     )}
@@ -515,8 +515,8 @@ export default function ChatPage({
           {/* Thinking indicator */}
           {loading && !isStreaming && (
             <div className="flex gap-3 max-w-[85%]">
-              <div className="w-6 h-6 rounded-full bg-emerald-950/60 border border-emerald-900/40 flex items-center justify-center shrink-0">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+              <div className="w-6 h-6 rounded-full bg-orange-950/60 border border-orange-900/40 flex items-center justify-center shrink-0">
+                <div className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></div>
               </div>
               <div className="flex items-center gap-1.5 text-xs text-neutral-500 font-semibold uppercase tracking-wider">
                 <span className="thinking-dots">Thinking</span>
@@ -538,7 +538,7 @@ export default function ChatPage({
       </div>
 
       {/* ── Input Area ──────────────────────────────────────────────────── */}
-      <div className="border-t border-neutral-900/60 px-6 py-4 shrink-0 bg-neutral-950/20 backdrop-blur-sm">
+      <div className="border-t border-[#262322] px-6 py-4 shrink-0 bg-[#121110]/20 backdrop-blur-sm">
         <div className="max-w-3xl mx-auto flex gap-3">
           <input
             ref={inputRef}
@@ -548,12 +548,12 @@ export default function ChatPage({
             onKeyDown={handleKeyDown}
             placeholder="Ask about your document…"
             disabled={loading}
-            className="flex-1 bg-neutral-950/50 text-neutral-200 rounded-xl px-4 py-2.5 text-xs outline-none border border-neutral-900 focus:border-emerald-500/30 placeholder:text-neutral-600 disabled:opacity-40 transition"
+            className="flex-1 bg-[#121110]/50 text-neutral-200 rounded-xl px-4 py-2.5 text-xs outline-none border border-[#262322] focus:border-orange-500/30 placeholder:text-neutral-600 disabled:opacity-40 transition"
           />
           <button
             onClick={sendMessage}
             disabled={loading || !question.trim()}
-            className="bg-emerald-500 hover:bg-emerald-400 disabled:bg-neutral-900 disabled:text-neutral-600 text-neutral-950 px-4 py-2.5 rounded-xl text-xs font-bold transition duration-300 disabled:cursor-not-allowed shrink-0 shadow-md shadow-emerald-500/10 hover:shadow-emerald-500/25"
+            className="bg-[#ededed] hover:bg-white disabled:bg-[#1a1817] disabled:text-neutral-600 text-neutral-950 px-5 py-2.5 rounded-full text-xs font-bold transition duration-300 disabled:cursor-not-allowed shrink-0 shadow-md shadow-black/10 hover:shadow-lg hover:shadow-black/20"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
