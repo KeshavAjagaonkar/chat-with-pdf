@@ -52,3 +52,13 @@ body {
   content: "";
   animation: thinking-dots 1.5s steps(4, end) infinite;
 }
+
+/* ── Premium SaaS Grid Pattern ──────────────────────────────────────────────
+   Uses a very subtle touch of emerald green (rgba(16,185,129,0.02)) for the grid lines.
+   This provides the background depth inspired by Linear, masterji.co, etc. */
+.bg-grid-pattern {
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(16, 185, 129, 0.025) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(16, 185, 129, 0.025) 1px, transparent 1px);
+}
