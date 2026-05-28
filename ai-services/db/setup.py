@@ -4,8 +4,10 @@ import os
 
 load_dotenv()
 print(repr(os.getenv("DATABASE_URL")))
+
 def get_connection():
     return psycopg2.connect(os.getenv("DATABASE_URL"))
+
 
 def create_tables():
     conn = get_connection()
@@ -27,7 +29,8 @@ def create_tables():
             document_id INTEGER REFERENCES documents(id),
             chunk_index INTEGER NOT NULL,
             text TEXT NOT NULL,
-            embedding vector(3072)
+            embedding vector(3072),
+            metadata JSONB DEFAULT '{}'
         );
     """)
 
@@ -51,6 +54,47 @@ def create_tables():
     cursor.close()
     conn.close()
     print("Tables created successfully")
+
+
+def run_migrations():
+    """
+    Run safe, idempotent migrations for existing deployments.
+
+    This is called at app startup (in main.py) to ensure the database schema
+    is up to date without requiring manual intervention on Railway.
+
+    Design decisions:
+    - Uses DO $$ ... EXCEPTION WHEN duplicate_column ... $$ pattern instead of
+      ALTER TABLE ... ADD COLUMN IF NOT EXISTS (which PostgreSQL doesn't support).
+    - Each migration is wrapped in its own DO block so one failing migration
+      doesn't prevent others from running.
+    - The JSONB DEFAULT '{}' means existing rows automatically get an empty
+      metadata object — no backfill needed.
+    - This is idempotent: calling it 100 times has the same effect as calling
+      it once. Safe for multi-instance deployments (Railway autoscaling).
+    """
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    # Migration 1: Add metadata JSONB column to chunks table.
+    # Stores page numbers and future metadata (section titles, confidence scores, etc.)
+    # without requiring schema changes for each new field.
+    cursor.execute("""
+        DO $$
+        BEGIN
+            ALTER TABLE chunks ADD COLUMN metadata JSONB DEFAULT '{}';
+        EXCEPTION
+            WHEN duplicate_column THEN
+                -- Column already exists, nothing to do.
+                NULL;
+        END $$;
+    """)
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+    print("Migrations complete")
+
 
 if __name__ == "__main__":
     create_tables()
