@@ -35,9 +35,9 @@ export default function LandingPage() {
       description: "Stop scrolling through hundreds of pages. Query lecture notes, dense textbooks, or journal articles and instantly generate clear study guides cited directly to the source page.",
       bulletPoints: ["Summarize lengthy thesis papers", "Generate test preps & flashcard outline", "Verify citations in seconds"],
       icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-        </svg>
+        <code className="text-[10px] font-mono font-bold text-[#d18a59] bg-[#121110] px-1.5 py-0.5 rounded border border-[#262322]">
+          [SYS.ACAD]
+        </code>
       ),
       preview: {
         documentName: "biology_textbook_ch4.pdf",
@@ -54,9 +54,9 @@ export default function LandingPage() {
       description: "Audit contracts, analyze service agreements, or review vendor compliance policies. Query key liabilities and let the AI direct you instantly to the precise paragraph in your contract.",
       bulletPoints: ["Pinpoint termination clauses", "Audit multi-page financial reports", "Cross-examine policy agreements"],
       icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
-        </svg>
+        <code className="text-[10px] font-mono font-bold text-[#d18a59] bg-[#121110] px-1.5 py-0.5 rounded border border-[#262322]">
+          [SYS.CORP]
+        </code>
       ),
       preview: {
         documentName: "commercial_lease_agreement.pdf",
@@ -73,9 +73,9 @@ export default function LandingPage() {
       description: "Mine scientific journals, query technical component datasheets, or lookup system installation guidelines. Access precise facts and calculations without reading the full index.",
       bulletPoints: ["Locate specific hardware specs", "Scan international regulatory guides", "Verify chemical/structural formulas"],
       icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-        </svg>
+        <code className="text-[10px] font-mono font-bold text-[#d18a59] bg-[#121110] px-1.5 py-0.5 rounded border border-[#262322]">
+          [SYS.DATA]
+        </code>
       ),
       preview: {
         documentName: "motor_controller_datasheet.pdf",
@@ -127,32 +127,32 @@ export default function LandingPage() {
   ];
 
   return (
-    <main className="min-h-screen bg-[#121110] bg-grid-pattern text-neutral-300 flex flex-col relative selection:bg-orange-500/20 selection:text-orange-300 overflow-x-hidden">
+    <main className="min-h-screen bg-[#121110] bg-grid-pattern text-neutral-300 flex flex-col relative selection:bg-[#d18a59]/20 selection:text-neutral-100 overflow-x-hidden">
       
-      {/* Decorative Cozy Warm Ambient Glows (Orange/Amber) */}
-      <div className="absolute top-0 left-1/4 w-[600px] h-[350px] bg-orange-500/5 rounded-full blur-[130px] pointer-events-none z-0" />
-      <div className="absolute top-1/3 right-1/4 w-[450px] h-[450px] bg-amber-500/5 rounded-full blur-[140px] pointer-events-none z-0" />
-      <div className="absolute bottom-1/4 left-1/3 w-[500px] h-[350px] bg-orange-600/5 rounded-full blur-[120px] pointer-events-none z-0" />
+      {/* Decorative Cozy Warm Ambient Glows (Muted Raw Copper/Amber) */}
+      <div className="absolute top-0 left-1/4 w-[600px] h-[350px] bg-[#d18a59]/3 rounded-full blur-[130px] pointer-events-none z-0" />
+      <div className="absolute top-1/3 right-1/4 w-[450px] h-[450px] bg-[#d18a59]/3 rounded-full blur-[140px] pointer-events-none z-0" />
+      <div className="absolute bottom-1/4 left-1/3 w-[500px] h-[350px] bg-[#d18a59]/2 rounded-full blur-[120px] pointer-events-none z-0" />
 
       {/* Frosted Glass Sticky Navigation (Charcoal background) */}
       <nav className="sticky top-0 z-50 backdrop-blur-md bg-[#121110]/75 border-b border-[#262322] px-6 md:px-12 py-4 flex items-center justify-between shrink-0 transition-all duration-300">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 bg-gradient-to-tr from-orange-500 to-amber-500 rounded-lg flex items-center justify-center text-neutral-950 font-black tracking-tight text-sm shadow-md shadow-orange-500/20">
-            P
+          <div className="w-7 h-7 bg-[#1a1817] border border-[#2a2624] rounded flex items-center justify-center text-[#d18a59] font-mono font-bold text-xs shadow-sm">
+            $
           </div>
-          <span className="text-sm font-bold tracking-tight text-neutral-100 uppercase">ChatPDF</span>
+          <span className="text-sm font-mono tracking-tight text-neutral-100 uppercase">doc-query</span>
         </div>
 
         <div className="flex items-center gap-3">
           <a
             href="/sign-in"
-            className="text-xs text-neutral-400 hover:text-neutral-100 transition duration-300 px-4 py-2"
+            className="text-xs text-neutral-400 hover:text-neutral-100 transition duration-300 px-4 py-2 font-medium"
           >
             Sign in
           </a>
           <a
             href="/sign-up"
-            className="text-xs bg-[#ededed] hover:bg-white text-neutral-950 font-bold px-5 py-2.5 rounded-full transition-all duration-300 shadow-md shadow-black/10 transform hover:scale-[1.01]"
+            className="text-xs bg-[#f4ebe1] hover:bg-[#faf5ef] text-[#121110] border border-[#d2c3b4] font-bold px-4 py-2 rounded-full transition-all duration-300 shadow-[0_1px_2px_rgba(0,0,0,0.05)]"
           >
             Start free
           </a>
@@ -162,153 +162,139 @@ export default function LandingPage() {
       {/* Benefit Hero Section */}
       <section className="flex flex-col items-center text-center px-6 pt-16 pb-12 md:pt-24 md:pb-16 max-w-4xl mx-auto shrink-0 relative z-10">
         
-        {/* Vector architecture status pill */}
-        <div className="inline-flex items-center gap-2 bg-orange-950/40 text-orange-400 text-[10px] uppercase tracking-widest font-bold px-3.5 py-1.5 rounded-full mb-6 border border-orange-900/30">
-          <span className="w-1.5 h-1.5 bg-orange-400 rounded-full animate-pulse"></span>
-          Vector Retrieval Ingestion Pipeline Active
+        {/* Technical Architecture Status Monospace Badge */}
+        <div className="inline-flex items-center gap-2 bg-[#1a1817] border border-[#2a2624] text-neutral-400 font-mono text-[10px] px-3.5 py-1.5 rounded-md mb-6 uppercase tracking-wider shadow-sm">
+          <span className="w-1.5 h-1.5 bg-[#d18a59] rounded-full"></span>
+          Ingestion Node: Active (PostgreSQL Vector + Gemini 2.5 Flash)
         </div>
 
-        <h1 className="text-4xl md:text-6xl font-black max-w-3xl leading-tight tracking-tight text-neutral-100">
-          Reading documents never feels{" "}
-          <span className="bg-gradient-to-r from-orange-400 via-amber-400 to-orange-300 bg-clip-text text-transparent relative">
-            lonely here
+        <h1 className="text-4xl md:text-6xl font-black max-w-4xl leading-tight tracking-tight text-neutral-100">
+          Grounded PDF Q&A with{" "}
+          <span className="text-[#d18a59] font-mono block sm:inline">
+            [page-level.attribution]
           </span>
         </h1>
 
         <p className="text-neutral-400 text-sm md:text-base mt-6 max-w-2xl leading-relaxed">
-          Upload manuals, textbooks, papers, or business reports. Ask questions in plain language and receive precise, verified answers cited down to the exact page number.
+          An ingestion pipeline built for mathematical precision. Index manuals, spec sheets, compliance documents, or textbook catalogs to compile multi-page vector segments—then query in plain language with exact source-level grounding.
         </p>
 
         {/* User-Centric Capsule Actions */}
         <div className="flex flex-col sm:flex-row items-center gap-4 mt-10 w-full sm:w-auto">
-          
           <button
             onClick={() => router.push("/sign-up")}
-            className="w-full sm:w-auto bg-[#ededed] hover:bg-white text-neutral-950 font-bold px-8 py-3.5 rounded-full transition-all duration-300 text-xs uppercase tracking-wider shadow-lg shadow-black/20 transform hover:scale-[1.02]"
+            className="w-full sm:w-auto bg-[#f4ebe1] hover:bg-[#faf5ef] text-[#121110] border border-[#d2c3b4] font-bold px-8 py-3.5 rounded-full transition-all duration-300 text-xs uppercase tracking-wider shadow-md shadow-black/10 transform hover:scale-[1.01]"
           >
             Upload a PDF Now
           </button>
           
           <a
             href="/sign-in"
-            className="w-full sm:w-auto border border-[#262322] bg-[#1a1817]/40 hover:bg-[#1a1817] text-neutral-300 font-bold px-6 py-3.5 rounded-full transition duration-300 text-xs uppercase tracking-wider"
+            className="w-full sm:w-auto border border-[#2a2624] bg-[#1a1817]/40 hover:bg-[#1a1817] text-neutral-300 font-mono font-bold px-6 py-3.5 rounded-full transition duration-300 text-xs uppercase tracking-wider"
           >
             View Dashboard
           </a>
         </div>
       </section>
 
-      {/* Sandbox Live Chat Preview Layout */}
+      {/* Sandbox Live Chat Preview Layout — Re-engineered as a Systems Inspection Console */}
       <section className="px-6 md:px-12 pb-20 max-w-5xl mx-auto w-full shrink-0 relative z-10">
-        <div className="bg-[#1a1817]/80 border border-[#262322] rounded-2xl p-2 md:p-3 shadow-[0_0_80px_rgba(249,115,22,0.015)] relative group hover:border-[#262322]/80 transition duration-500">
+        <div className="bg-[#1a1817] border border-[#262322] rounded-2xl p-2 md:p-3 shadow-[0_0_80px_rgba(209,138,89,0.02)] relative group hover:border-[#2a2624] transition duration-500">
           
           {/* Top sandbox bar */}
-          <div className="flex items-center justify-between px-3 py-2 border-b border-[#262322]/80 mb-2">
+          <div className="flex items-center justify-between px-3 py-2 border-b border-[#262322] mb-2 font-mono">
             <div className="flex items-center gap-1.5">
-              <div className="w-2.5 h-2.5 rounded-full bg-neutral-800"></div>
-              <div className="w-2.5 h-2.5 rounded-full bg-neutral-800"></div>
-              <div className="w-2.5 h-2.5 rounded-full bg-neutral-800"></div>
-              <span className="text-[10px] text-neutral-600 font-mono ml-4 truncate">sandboxed-vector-agent v1.2</span>
+              <div className="w-2.5 h-2.5 rounded-full bg-[#262322]"></div>
+              <div className="w-2.5 h-2.5 rounded-full bg-[#262322]"></div>
+              <div className="w-2.5 h-2.5 rounded-full bg-[#262322]"></div>
+              <span className="text-[10px] text-neutral-600 ml-4">RAG_CLIENT_INSPECT_CONSOLE v2.4</span>
             </div>
             
-            {/* Streak indicator on sandbox */}
-            <div className="flex items-center gap-1 bg-orange-950/40 text-orange-400 border border-orange-900/30 px-2 py-0.5 rounded-full text-[9px] font-bold">
-              <span className="w-1 h-1 bg-orange-400 rounded-full animate-ping"></span>
-              127 days streak
+            <div className="flex items-center gap-2 bg-[#121110] border border-[#262322] px-2.5 py-0.5 rounded text-[9px] font-mono text-neutral-500">
+              <span className="w-1.5 h-1.5 bg-[#d18a59] rounded-full"></span>
+              CLUSTER STATS: NORMAL
             </div>
           </div>
 
-          <div className="grid md:grid-cols-5 gap-3 h-[420px] rounded-xl overflow-hidden text-xs">
+          <div className="grid md:grid-cols-12 gap-3 h-[420px] rounded-xl overflow-hidden text-xs font-mono bg-[#121110]">
             
-            {/* PDF side view mockup */}
-            <div className="hidden md:flex md:col-span-2 bg-[#121110] border border-[#262322]/60 rounded-lg p-4 flex-col gap-4 overflow-hidden relative">
-              <div className="flex items-center justify-between border-b border-[#262322]/60 pb-2">
-                <span className="font-semibold text-neutral-400 tracking-wide uppercase text-[10px]">vendor_agreement_doc.pdf</span>
-                <span className="text-[10px] text-neutral-600 bg-neutral-900 px-1.5 py-0.5 rounded">Page {mockChatSteps[activeStep].pages[0]} of 24</span>
+            {/* Left Column (35%): SYSTEM REGISTRY TREE INDEX */}
+            <div className="hidden md:flex md:col-span-4 bg-[#121110] border-r border-[#262322] p-4 flex-col gap-4 overflow-hidden relative select-none">
+              <div className="border-b border-[#262322] pb-2 text-[10px] text-neutral-500 uppercase font-bold tracking-wider">
+                DOCUMENT REGISTRY
               </div>
-              <div className="flex-1 flex flex-col gap-3 opacity-60">
-                <div className="h-4 bg-neutral-900 rounded w-full"></div>
-                <div className="h-4 bg-neutral-900 rounded w-11/12"></div>
-                <div className="h-4 bg-neutral-900 rounded w-10/12"></div>
-                <div className="h-4 bg-neutral-900 rounded w-full"></div>
-                <div className="h-4 bg-neutral-900 rounded w-3/4 bg-orange-950/20 border-l-2 border-orange-500/30 pl-2">
-                  <div className="h-2 bg-orange-500/20 rounded w-11/12 mt-1"></div>
-                </div>
-                <div className="h-4 bg-neutral-900 rounded w-full"></div>
-                <div className="h-4 bg-neutral-900 rounded w-8/12"></div>
-              </div>
-            </div>
-
-            {/* AI Chat panel mockup */}
-            <div className="col-span-5 md:col-span-3 bg-[#131211]/85 border border-[#262322]/60 rounded-lg flex flex-col overflow-hidden">
-              
-              {/* Sandbox chat Header */}
-              <div className="px-4 py-2 border-b border-[#262322]/60 flex items-center justify-between shrink-0 bg-[#1a1817]/40">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-orange-500 animate-ping"></div>
-                  <span className="text-neutral-300 font-medium">Assistant Streaming Context</span>
-                </div>
-                
-                {/* Step indicators */}
-                <div className="flex gap-1.5">
-                  {mockChatSteps.map((_, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => setActiveStep(idx)}
-                      className={`w-4 h-1.5 rounded-full transition duration-300 ${
-                        idx === activeStep ? "bg-orange-500" : "bg-neutral-800"
-                      }`}
-                    ></button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Chat display sandbox body */}
-              <div className="flex-1 p-4 flex flex-col gap-4 overflow-y-auto font-sans">
-                {/* User bubble */}
-                <div className="flex justify-end shrink-0">
-                  <div className="bg-[#1a1817] text-neutral-100 rounded-2xl rounded-br-md px-3.5 py-2 max-w-[80%] leading-relaxed border border-[#262322]">
-                    {mockChatSteps[activeStep].user}
-                  </div>
-                </div>
-
-                {/* Assistant response */}
-                <div className="flex gap-2.5 max-w-[90%] shrink-0">
-                  <div className="w-5 h-5 rounded-full bg-orange-950 border border-orange-900/40 flex items-center justify-center shrink-0 mt-0.5">
-                    <div className="w-1 h-1 rounded-full bg-orange-500"></div>
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <p className="text-neutral-300 leading-relaxed font-sans">
-                      {mockChatSteps[activeStep].assistant.split("**").map((text, i) => 
-                        i % 2 === 1 ? <strong key={i} className="text-neutral-100 font-semibold">{text}</strong> : text
-                      )}
-                    </p>
-                    
-                    {/* Collapsible reference badge */}
-                    <div className="flex items-center gap-1.5 mt-1">
-                      <span className="text-[10px] bg-orange-950/60 text-orange-400 px-2 py-0.5 rounded border border-orange-900/30 font-medium">
-                        {mockChatSteps[activeStep].pages.length === 1 
-                          ? `Page ${mockChatSteps[activeStep].pages[0]}` 
-                          : `Pages ${mockChatSteps[activeStep].pages[0]}–${mockChatSteps[activeStep].pages[mockChatSteps[activeStep].pages.length - 1]}`
-                        }
-                      </span>
-                      <span className="text-[9px] text-neutral-600">Source verified from vector storage</span>
+              <div className="flex-1 flex flex-col gap-3 font-mono text-[11px] text-neutral-400">
+                <div>
+                  <span className="text-neutral-600">/workspace</span>
+                  <div className="pl-4 mt-2 space-y-1.5">
+                    <div className="flex items-center justify-between hover:text-neutral-200 transition">
+                      <span>📄 commercial_lease.pdf</span>
+                      <span className="text-[9px] text-[#d18a59] bg-[#1a1817] px-1 rounded border border-[#262322]">18p</span>
+                    </div>
+                    <div className="flex items-center justify-between text-neutral-600">
+                      <span>📄 system_spec_v4.pdf</span>
+                      <span className="text-[9px] bg-neutral-900 px-1 rounded">124p</span>
+                    </div>
+                    <div className="flex items-center justify-between text-neutral-600">
+                      <span>📄 biology_textbook.pdf</span>
+                      <span className="text-[9px] bg-neutral-900 px-1 rounded">68p</span>
                     </div>
                   </div>
                 </div>
+
+                <div className="mt-auto border-t border-[#262322] pt-3 text-[10px] text-neutral-500 space-y-1">
+                  <div>VECTOR ENGINE: PGVECTOR</div>
+                  <div>INDEX CAPACITY: 8.4 GB</div>
+                  <div>LATEST EMBEDDING: COMPLETE</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column (65%): SIMULATED REAL-WORLD QUERY EXECUTION */}
+            <div className="col-span-12 md:col-span-8 bg-[#121110] p-4 flex flex-col justify-between overflow-hidden">
+              <div className="border-b border-[#262322] pb-2 text-[10px] text-neutral-500 uppercase font-bold tracking-wider mb-3">
+                VECTOR QUERY EXECUTION LOG
               </div>
 
-              {/* Input section mock */}
-              <div className="p-3 border-t border-[#262322]/60 flex gap-2 shrink-0 bg-[#121110]/30">
-                <div className="flex-1 bg-[#1a1817] rounded-lg px-3 py-2 text-neutral-600 flex items-center border border-[#262322]">
-                  Ask a follow-up query...
+              {/* Execution Console outputs */}
+              <div className="flex-1 overflow-y-auto space-y-4 text-[11px] md:text-xs">
+                
+                {/* Console command input */}
+                <div>
+                  <div className="text-neutral-500 text-[10px] mb-1">2026-05-29T00:48:37Z - [SYS.QUERY]</div>
+                  <div className="bg-[#1a1817] border border-[#262322] px-3.5 py-2.5 rounded-lg text-neutral-200 flex items-center justify-between">
+                    <span>$ doc-search --file-id commercial_lease.pdf --query &quot;What is the notice period for rent default?&quot;</span>
+                  </div>
                 </div>
-                <div className="bg-orange-500 text-neutral-950 w-8 h-8 rounded-lg flex items-center justify-center shadow shadow-orange-500/10">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M12 5l7 7-7 7" />
-                  </svg>
+
+                {/* Similarity search execute steps */}
+                <div className="space-y-1.5 text-neutral-500 font-mono text-[10px] pl-1">
+                  <div>[SYS.LOAD] Loading embeddings for document_id: 81... done</div>
+                  <div>[SYS.VEC] Generating 1536-dimensional query embedding vector... done</div>
+                  <div className="text-[#d18a59]">[SYS.MATH] Executing cosine similarity matrix scan... found 1 segment over similarity_threshold (0.842)</div>
                 </div>
+
+                {/* Highlighted exact source segment match */}
+                <div className="bg-[#181615] border border-[#2a2624] rounded-xl p-3.5 relative overflow-hidden">
+                  <div className="flex items-center justify-between text-[9px] uppercase tracking-widest text-neutral-500 font-bold mb-1.5 border-b border-[#262322] pb-1.5">
+                    <span>📄 segment extract match #24</span>
+                    <span className="text-[#d18a59] bg-[#d18a59]/10 border border-[#d18a59]/20 px-1.5 py-0.5 rounded font-mono">Page 14</span>
+                  </div>
+                  <p className="text-xs text-neutral-300 leading-relaxed italic font-mono bg-[#121110]/50 p-2 rounded-lg border border-[#262322]/40">
+                    &quot;...Landlord may terminate this lease upon 30 days prior written notice should Tenant fail to cure a rental default within 10 business days of initial notification...&quot;
+                  </p>
+                </div>
+
+                {/* Strictly grounded attributed response output */}
+                <div>
+                  <div className="text-[#d18a59] text-[10px] mb-1">[SYS.RESPONSE] Strictly grounded in Page 14</div>
+                  <div className="bg-[#1a1817] border border-[#262322] p-3 rounded-lg text-neutral-200 leading-relaxed font-sans text-xs">
+                    The landlord can terminate the lease upon a **30-day written notice**, but only if you fail to cure the default within **10 business days** of receiving notice.
+                  </div>
+                </div>
+
               </div>
+
             </div>
           </div>
         </div>
@@ -318,7 +304,7 @@ export default function LandingPage() {
       <section className="px-6 md:px-12 py-16 md:py-24 max-w-6xl mx-auto relative z-10 border-t border-[#262322] w-full shrink-0">
         
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <h2 className="text-xs font-bold text-orange-400 uppercase tracking-widest mb-3">Tailored Use Cases</h2>
+          <h2 className="text-xs font-bold text-[#d18a59] uppercase tracking-widest mb-3">Tailored Use Cases</h2>
           <p className="text-2xl md:text-4xl font-black tracking-tight text-neutral-100 leading-tight">
             Designed for how you actually work
           </p>
@@ -344,17 +330,13 @@ export default function LandingPage() {
                       : "bg-transparent border-transparent hover:bg-[#1a1817]/40 hover:border-[#262322]/40"
                   }`}
                 >
-                  <div className={`p-2.5 rounded-xl border transition duration-300 ${
-                    isActive 
-                      ? "bg-orange-950/60 border-orange-500/30 text-orange-400" 
-                      : "bg-[#1a1817] border-[#262322] text-neutral-500"
-                  }`}>
+                  <div className="flex-shrink-0">
                     {uc.icon}
                   </div>
                   
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2 mb-1">
-                      <span className={`text-[10px] font-bold uppercase tracking-wider ${isActive ? "text-orange-400" : "text-neutral-500"}`}>
+                      <span className={`text-[10px] font-mono font-bold uppercase tracking-wider ${isActive ? "text-[#d18a59]" : "text-neutral-500"}`}>
                         {uc.category}
                       </span>
                     </div>
@@ -367,15 +349,15 @@ export default function LandingPage() {
 
           {/* Right: Immersive focused display card */}
           <div className="lg:col-span-8 bg-[#1a1817] border border-[#262322] rounded-3xl p-6 md:p-8 flex flex-col justify-between shadow-[0_30px_70px_-15px_rgba(0,0,0,0.8)] relative overflow-hidden transition-all duration-500 min-h-[440px]">
-            {/* Ambient amber glow behind right display card */}
-            <div className="absolute -top-16 -right-16 w-48 h-48 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
+            {/* Ambient copper glow behind right display card */}
+            <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#d18a59]/5 rounded-full blur-3xl pointer-events-none" />
 
             <div className="relative z-10 flex-1 flex flex-col">
               
               {/* Badge & Category Header */}
               <div className="flex items-center justify-between pb-4 border-b border-[#262322]/60 mb-6 shrink-0">
-                <span className="text-xs font-bold text-orange-400 uppercase tracking-widest">{useCases[activeUseCase].category}</span>
-                <span className="text-[10px] bg-orange-950/60 text-orange-400 px-3 py-1 rounded-full border border-orange-900/30 font-bold uppercase tracking-wider">
+                <span className="text-xs font-bold text-[#d18a59] uppercase tracking-widest">{useCases[activeUseCase].category}</span>
+                <span className="text-[10px] bg-[#d18a59]/10 text-[#d18a59] px-3 py-1 rounded border border-[#d18a59]/25 font-bold uppercase tracking-wider">
                   {useCases[activeUseCase].badge}
                 </span>
               </div>
@@ -395,7 +377,7 @@ export default function LandingPage() {
                 <div className="pb-3 border-b border-[#262322]/80 flex flex-col gap-1.5">
                   <div className="flex items-center justify-between text-[9px] uppercase tracking-widest text-neutral-500 font-bold font-mono">
                     <span>📄 Extracted {useCases[activeUseCase].preview.documentName}</span>
-                    <span className="text-orange-400/80 bg-orange-950/40 px-1.5 py-0.5 rounded border border-orange-900/20">{useCases[activeUseCase].preview.page}</span>
+                    <span className="text-[#d18a59] bg-[#d18a59]/10 border border-[#d18a59]/20 px-1.5 py-0.5 rounded font-mono">{useCases[activeUseCase].preview.page}</span>
                   </div>
                   <p className="text-[11px] md:text-xs text-neutral-400 leading-relaxed italic bg-[#1a1817]/40 px-3 py-2 rounded-lg border border-[#262322]/40 font-mono">
                     {useCases[activeUseCase].preview.extractedText}
@@ -404,14 +386,14 @@ export default function LandingPage() {
 
                 {/* AI Query & Cited Response block */}
                 <div className="flex flex-col gap-2.5">
-                  <div className="flex items-center gap-2 self-start bg-[#1a1817] px-3 py-1.5 rounded-full border border-[#262322] text-[11px] md:text-xs text-neutral-200">
-                    <span className="w-1.5 h-1.5 bg-orange-400 rounded-full"></span>
+                  <div className="flex items-center gap-2 self-start bg-[#1a1817] px-3 py-1.5 rounded-full border border-[#262322] text-[11px] md:text-xs text-neutral-200 font-mono">
+                    <span className="w-1.5 h-1.5 bg-[#d18a59] rounded-full"></span>
                     <span><strong>Query:</strong> {useCases[activeUseCase].preview.userQuery}</span>
                   </div>
                   
                   <div className="flex gap-2 max-w-[95%]">
-                    <div className="w-4 h-4 rounded-full bg-orange-950 border border-orange-900/40 flex items-center justify-center shrink-0 mt-0.5">
-                      <div className="w-1.5 h-1.5 rounded-full bg-orange-500"></div>
+                    <div className="w-4 h-4 rounded-full bg-[#121110] border border-[#262322] flex items-center justify-center shrink-0 mt-0.5">
+                      <div className="w-1.5 h-1.5 rounded-full bg-[#d18a59]"></div>
                     </div>
                     <p className="text-[11px] md:text-xs text-neutral-300 leading-relaxed">
                       <strong>Response:</strong> {useCases[activeUseCase].preview.assistantResponse.split("**").map((txt, ti) => 
@@ -433,7 +415,7 @@ export default function LandingPage() {
                     key={bidx} 
                     className="bg-[#121110] border border-[#262322] text-neutral-300 text-xs px-3.5 py-1.5 rounded-full flex items-center gap-2 font-medium"
                   >
-                    <span className="w-1.5 h-1.5 bg-orange-500 rounded-full shrink-0"></span>
+                    <span className="w-1.5 h-1.5 bg-[#d18a59] rounded-full shrink-0"></span>
                     <span>{bp}</span>
                   </div>
                 ))}
@@ -448,7 +430,7 @@ export default function LandingPage() {
       {/* Step-by-Step Interactive Workflow */}
       <section className="px-6 md:px-12 py-16 md:py-24 max-w-4xl mx-auto relative z-10 border-t border-[#262322] w-full shrink-0">
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <h2 className="text-xs font-bold text-orange-400 uppercase tracking-widest mb-3">Vector Ingestion</h2>
+          <h2 className="text-xs font-bold text-[#d18a59] uppercase tracking-widest mb-3">Vector Ingestion</h2>
           <p className="text-2xl md:text-3xl font-black tracking-tight text-neutral-100 leading-tight">
             How our pipeline compound works
           </p>
@@ -458,7 +440,7 @@ export default function LandingPage() {
           
           {/* Step 1 */}
           <div className="bg-[#1a1817]/40 border border-[#262322] rounded-xl p-5 relative overflow-hidden flex flex-col gap-3">
-            <span className="text-[10px] bg-[#121110] text-neutral-500 font-mono w-6 h-6 rounded-md flex items-center justify-center shrink-0 font-bold border border-[#262322]">01</span>
+            <span className="text-[10px] bg-[#121110] text-[#d18a59] font-mono w-6 h-6 rounded-md flex items-center justify-center shrink-0 font-bold border border-[#262322]">01</span>
             <h3 className="text-sm font-bold text-neutral-100 tracking-tight uppercase">Segmented Parsing</h3>
             <p className="text-xs md:text-sm text-neutral-400 leading-relaxed">
               We process your PDF on load, parsing exact page boundaries separately to prevent metadata loss during downstream chunking.
@@ -467,7 +449,7 @@ export default function LandingPage() {
 
           {/* Step 2 */}
           <div className="bg-[#1a1817]/40 border border-[#262322] rounded-xl p-5 relative overflow-hidden flex flex-col gap-3">
-            <span className="text-[10px] bg-[#121110] text-neutral-500 font-mono w-6 h-6 rounded-md flex items-center justify-center shrink-0 font-bold border border-[#262322]">02</span>
+            <span className="text-[10px] bg-[#121110] text-[#d18a59] font-mono w-6 h-6 rounded-md flex items-center justify-center shrink-0 font-bold border border-[#262322]">02</span>
             <h3 className="text-sm font-bold text-neutral-100 tracking-tight uppercase">Multi-page Vectorization</h3>
             <p className="text-xs md:text-sm text-neutral-400 leading-relaxed">
               Words are vectorized into multi-dimensional embeddings, keeping structural metadata in Postgres JSONB stores.
@@ -476,7 +458,7 @@ export default function LandingPage() {
 
           {/* Step 3 */}
           <div className="bg-[#1a1817]/40 border border-[#262322] rounded-xl p-5 relative overflow-hidden flex flex-col gap-3">
-            <span className="text-[10px] bg-[#121110] text-neutral-500 font-mono w-6 h-6 rounded-md flex items-center justify-center shrink-0 font-bold border border-[#262322]">03</span>
+            <span className="text-[10px] bg-[#121110] text-[#d18a59] font-mono w-6 h-6 rounded-md flex items-center justify-center shrink-0 font-bold border border-[#262322]">03</span>
             <h3 className="text-sm font-bold text-neutral-100 tracking-tight uppercase">Traceable Generation</h3>
             <p className="text-xs md:text-sm text-neutral-400 leading-relaxed">
               Gemini fetches overlapping vector chunks and returns clear bullet points carrying citation page badges for you to verify.
@@ -489,7 +471,7 @@ export default function LandingPage() {
       <section className="px-6 md:px-12 py-16 md:py-24 max-w-3xl mx-auto relative z-10 border-t border-[#262322] w-full shrink-0">
         
         <div className="text-center max-w-xl mx-auto mb-16">
-          <h2 className="text-xs font-bold text-orange-400 uppercase tracking-widest mb-3">Common Questions</h2>
+          <h2 className="text-xs font-bold text-[#d18a59] uppercase tracking-widest mb-3">Common Questions</h2>
           <p className="text-2xl md:text-3xl font-black tracking-tight text-neutral-100 leading-tight">
             Frequently Asked Questions
           </p>
@@ -506,12 +488,12 @@ export default function LandingPage() {
                 {/* FAQ Question button */}
                 <button
                   onClick={() => setOpenFaq(isOpen ? null : idx)}
-                  className="w-full text-left px-5 py-4 flex items-center justify-between text-sm md:text-base font-bold text-neutral-200 tracking-tight hover:text-neutral-100 transition select-none outline-none focus:text-orange-400"
+                  className="w-full text-left px-5 py-4 flex items-center justify-between text-sm md:text-base font-bold text-neutral-200 tracking-tight hover:text-neutral-100 transition select-none outline-none focus:text-[#d18a59]"
                 >
                   <span>{faq.q}</span>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className={`h-4.5 w-4.5 text-neutral-600 transition-transform duration-300 ${isOpen ? "rotate-180 text-orange-400" : ""}`}
+                    className={`h-4.5 w-4.5 text-neutral-600 transition-transform duration-300 ${isOpen ? "rotate-180 text-[#d18a59]" : ""}`}
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -548,7 +530,7 @@ export default function LandingPage() {
         <div className="mt-8">
           <button
             onClick={() => router.push("/sign-up")}
-            className="bg-[#ededed] hover:bg-white text-neutral-950 font-bold px-8 py-3.5 rounded-full transition-all duration-300 text-xs uppercase tracking-wider shadow-lg shadow-black/25 transform hover:scale-[1.02]"
+            className="bg-[#f4ebe1] hover:bg-[#faf5ef] text-[#121110] border border-[#d2c3b4] font-bold px-8 py-3.5 rounded-full transition-all duration-300 text-xs uppercase tracking-wider shadow-lg shadow-black/25 transform hover:scale-[1.02]"
           >
             Create Free Account
           </button>
