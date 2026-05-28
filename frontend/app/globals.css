@@ -62,3 +62,111 @@ body {
     linear-gradient(to right, rgba(16, 185, 129, 0.025) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(16, 185, 129, 0.025) 1px, transparent 1px);
 }
+
+/* ── Clerk High-Legibility Dark Theme Overrides ─────────────────────────────
+   Provides explicit CSS overrides targeting Clerk elements to guarantee
+   maximum text legibility and contrast against dark backgrounds. */
+.cl-card,
+.cl-signIn-start,
+.cl-signUp-start {
+  background-color: #09090b !important;
+  border: 1px solid #27272a !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8) !important;
+}
+
+.cl-headerTitle {
+  color: #f4f4f5 !important;
+  font-weight: 700 !important;
+  font-size: 1.25rem !important;
+}
+
+.cl-headerSubtitle {
+  color: #a1a1aa !important;
+}
+
+.cl-socialButtonsBlockButton {
+  background-color: #18181b !important;
+  border: 1px solid #27272a !important;
+  color: #e4e4e7 !important;
+  transition: all 0.2s ease !important;
+}
+
+.cl-socialButtonsBlockButton:hover {
+  background-color: #27272a !important;
+  color: #ffffff !important;
+}
+
+.cl-socialButtonsBlockButtonText {
+  color: #e4e4e7 !important;
+  font-weight: 600 !important;
+}
+
+.cl-dividerLine {
+  background-color: #27272a !important;
+}
+
+.cl-dividerText {
+  color: #71717a !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+}
+
+.cl-formFieldLabel {
+  color: #d4d4d8 !important;
+  font-weight: 600 !important;
+}
+
+.cl-formFieldInput {
+  background-color: #18181b !important;
+  border: 1px solid #27272a !important;
+  color: #f4f4f5 !important;
+  transition: all 0.2s ease !important;
+}
+
+.cl-formFieldInput:focus {
+  border-color: rgba(16, 185, 129, 0.5) !important;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.1) !important;
+}
+
+.cl-formButtonPrimary {
+  background-color: #10b981 !important;
+  color: #09090b !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  transition: all 0.2s ease !important;
+}
+
+.cl-formButtonPrimary:hover {
+  background-color: #34d399 !important;
+  transform: translateY(-0.5px) !important;
+}
+
+.cl-footerActionText {
+  color: #a1a1aa !important;
+}
+
+.cl-footerActionLink {
+  color: #34d399 !important;
+  font-weight: 700 !important;
+  text-decoration: underline !important;
+  text-underline-offset: 4px !important;
+  transition: all 0.2s ease !important;
+}
+
+.cl-footerActionLink:hover {
+  color: #6ee7b7 !important;
+}
+
+/* Ensure Google and other auth icon buttons have clean contrast */
+.cl-socialButtonsIconButton {
+  background-color: #18181b !important;
+  border: 1px solid #27272a !important;
+  color: #e4e4e7 !important;
+}
+
+.cl-socialButtonsIconButton:hover {
+  background-color: #27272a !important;
+}
