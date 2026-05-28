@@ -59,8 +59,8 @@ body {
 .bg-grid-pattern {
   background-size: 40px 40px;
   background-image: 
-    linear-gradient(to right, rgba(249, 115, 22, 0.018) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(249, 115, 22, 0.018) 1px, transparent 1px);
+    linear-gradient(to right, rgba(200, 106, 62, 0.012) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(200, 106, 62, 0.012) 1px, transparent 1px);
 }
 
 /* ── Clerk High-Legibility Dark Theme Overrides ─────────────────────────────
@@ -126,21 +126,23 @@ body {
 }
 
 .cl-formFieldInput:focus {
-  border-color: rgba(249, 115, 22, 0.5) !important;
-  box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.1) !important;
+  border-color: rgba(200, 106, 62, 0.4) !important;
+  box-shadow: 0 0 0 2px rgba(200, 106, 62, 0.1) !important;
 }
 
 .cl-formButtonPrimary {
-  background-color: #f97316 !important;
+  background-color: #f4ebe1 !important;
   color: #121110 !important;
   font-weight: 700 !important;
   text-transform: uppercase !important;
   letter-spacing: 0.05em !important;
+  border: 1px solid #d2c3b4 !important;
+  border-radius: 9999px !important;
   transition: all 0.2s ease !important;
 }
 
 .cl-formButtonPrimary:hover {
-  background-color: #ea580c !important;
+  background-color: #faf5ef !important;
   transform: translateY(-0.5px) !important;
 }
 
@@ -149,7 +151,7 @@ body {
 }
 
 .cl-footerActionLink {
-  color: #f97316 !important;
+  color: #e28a5f !important;
   font-weight: 700 !important;
   text-decoration: underline !important;
   text-underline-offset: 4px !important;
@@ -157,7 +159,7 @@ body {
 }
 
 .cl-footerActionLink:hover {
-  color: #ea580c !important;
+  color: #f3a87f !important;
 }
 
 /* Ensure Google and other auth icon buttons have clean contrast */

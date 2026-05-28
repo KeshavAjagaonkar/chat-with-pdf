@@ -35,8 +35,8 @@ export default function LandingPage() {
       description: "Stop scrolling through hundreds of pages. Query lecture notes, dense textbooks, or journal articles and instantly generate clear study guides cited directly to the source page.",
       bulletPoints: ["Summarize lengthy thesis papers", "Generate test preps & flashcard outline", "Verify citations in seconds"],
       icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" className="h-5 w-5 text-[#c86a3e]" stroke="currentColor" strokeWidth={1.5} fill="none">
-          <path d="M128,32L24,80l104,48,104-48Z" fill="currentColor" className="fill-[#c86a3e]/10" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" className="h-5 w-5 text-current" stroke="currentColor" strokeWidth={1.5} fill="none">
+          <path d="M128,32L24,80l104,48,104-48Z" fill="currentColor" className="fill-current opacity-15" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
           <path d="M64,98.5V160c0,26.5,28.7,48,64,48s64-21.5,64-48V98.5" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
           <path d="M224,80v64" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
@@ -56,12 +56,12 @@ export default function LandingPage() {
       description: "Audit contracts, analyze service agreements, or review vendor compliance policies. Query key liabilities and let the AI direct you instantly to the precise paragraph in your contract.",
       bulletPoints: ["Pinpoint termination clauses", "Audit multi-page financial reports", "Cross-examine policy agreements"],
       icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" className="h-5 w-5 text-[#c86a3e]" stroke="currentColor" strokeWidth={1.5} fill="none">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" className="h-5 w-5 text-current" stroke="currentColor" strokeWidth={1.5} fill="none">
           <path d="M128,32V208" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
           <path d="M80,208H176" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
           <path d="M56,72h144" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
-          <path d="M56,72L32,136c0,13.3,10.7,24,24,24s24-10.7,24-24Z" fill="currentColor" className="fill-[#c86a3e]/10" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
-          <path d="M200,72l-24,64c0,13.3,10.7,24,24,24s24-10.7,24-24Z" fill="currentColor" className="fill-[#c86a3e]/10" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M56,72L32,136c0,13.3,10.7,24,24,24s24-10.7,24-24Z" fill="currentColor" className="fill-current opacity-15" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M200,72l-24,64c0,13.3,10.7,24,24,24s24-10.7,24-24Z" fill="currentColor" className="fill-current opacity-15" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       ),
       preview: {
@@ -79,8 +79,8 @@ export default function LandingPage() {
       description: "Mine scientific journals, query technical component datasheets, or lookup system installation guidelines. Access precise facts and calculations without reading the full index.",
       bulletPoints: ["Locate specific hardware specs", "Scan international regulatory guides", "Verify chemical/structural formulas"],
       icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" className="h-5 w-5 text-[#c86a3e]" stroke="currentColor" strokeWidth={1.5} fill="none">
-          <path d="M184,184l33.4,44.5A8,8,0,0,1,211,241H45a8,8,0,0,1-6.4-12.8L72,184Z" fill="currentColor" className="fill-[#c86a3e]/10" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" className="h-5 w-5 text-current" stroke="currentColor" strokeWidth={1.5} fill="none">
+          <path d="M184,184l33.4,44.5A8,8,0,0,1,211,241H45a8,8,0,0,1-6.4-12.8L72,184Z" fill="currentColor" className="fill-current opacity-15" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
           <path d="M104,184V104H88V80h80v24H152v80" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
           <path d="M72,184H184" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
@@ -332,23 +332,23 @@ export default function LandingPage() {
                 <button
                   key={i}
                   onClick={() => setActiveUseCase(i)}
-                  className={`w-64 lg:w-full text-left p-5 rounded-2xl border transition-all duration-300 flex items-start gap-4 focus:outline-none shrink-0 select-none ${
+                  className={`w-64 lg:w-full text-left p-5 rounded-2xl border transition-all duration-300 flex items-start gap-4 focus:outline-none shrink-0 select-none group ${
                     isActive 
-                      ? "bg-[#1a1817] border-[#c8b9a6]/25 shadow-[0_4px_20px_rgba(0,0,0,0.4)] translate-x-1" 
-                      : "bg-transparent border-transparent hover:bg-[#1a1817]/40 hover:border-[#c8b9a6]/10"
+                      ? "bg-[#1a1817] border-[#c8b9a6]/25 shadow-[0_4px_20px_rgba(0,0,0,0.4)] translate-x-1 text-neutral-200" 
+                      : "bg-transparent border-transparent hover:bg-[#1a1817]/40 hover:border-[#c8b9a6]/10 text-neutral-400 hover:text-neutral-200"
                   }`}
                 >
                   <div className={`p-2.5 rounded-xl border transition duration-300 ${
                     isActive 
-                      ? "bg-[#c86a3e]/10 border-[#c86a3e]/30 text-[#c86a3e]" 
-                      : "bg-[#1a1817] border-[#c8b9a6]/10 text-neutral-500"
+                      ? "bg-[#c86a3e]/20 border-[#c86a3e]/55 text-[#e28a5f]" 
+                      : "bg-[#1a1817] border-[#c8b9a6]/10 text-[#c8b9a6]/55 group-hover:text-[#e28a5f] group-hover:border-[#c8b9a6]/20"
                   }`}>
                     {uc.icon}
                   </div>
                   
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2 mb-1">
-                      <span className={`text-[10px] font-mono font-bold uppercase tracking-wider ${isActive ? "text-[#c86a3e]" : "text-neutral-500"}`}>
+                      <span className={`text-[10px] font-mono font-bold uppercase tracking-wider ${isActive ? "text-[#e28a5f]" : "text-neutral-500 group-hover:text-neutral-400 transition"}`}>
                         {uc.category}
                       </span>
                     </div>
@@ -404,8 +404,8 @@ export default function LandingPage() {
                   </div>
                   
                   <div className="flex gap-2 max-w-[95%]">
-                    <div className="w-4 h-4 rounded-full bg-[#121110] border border-[#c8b9a6]/15 flex items-center justify-center shrink-0 mt-0.5">
-                      <div className="w-1.5 h-1.5 rounded-full bg-[#c86a3e]"></div>
+                    <div className="w-4 h-4 rounded-md bg-[#121110] border border-[#c8b9a6]/15 flex items-center justify-center shrink-0 mt-0.5 select-none font-mono">
+                      <span className="text-[9px] text-[#e28a5f] font-bold leading-none">&gt;</span>
                     </div>
                     <p className="text-[11px] md:text-xs text-neutral-300 leading-relaxed">
                       <strong>Response:</strong> {useCases[activeUseCase].preview.assistantResponse.split("**").map((txt, ti) => 
