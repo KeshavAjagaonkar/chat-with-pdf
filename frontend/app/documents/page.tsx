@@ -5,12 +5,10 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import { useAuth, UserButton } from "@clerk/nextjs";
 
-// TypeScript interface for a document returned by the API.
-// This gives us autocomplete and type-checking when working with documents.
 interface Document {
   id: number;
   filename: string;
-  uploaded_at: string; // ISO date string from Python
+  uploaded_at: string;
 }
 
 export default function DocumentsPage() {
@@ -19,15 +17,15 @@ export default function DocumentsPage() {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [deleting, setDeleting] = useState<number | null>(null); // tracks which doc is being deleted
+  const [deleting, setDeleting] = useState<number | null>(null);
 
-  // useEffect with [] runs once on mount — perfect for fetching data.
-  // We define an async function inside because useEffect itself can't be async.
+  // Search filter query
+  const [searchQuery, setSearchQuery] = useState("");
+
   useEffect(() => {
     const fetchDocuments = async () => {
       try {
         const token = await getToken();
-
         const response = await axios.get(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/documents`,
           {
@@ -36,7 +34,6 @@ export default function DocumentsPage() {
             },
           }
         );
-
         setDocuments(response.data.documents);
       } catch (err) {
         setError("Failed to load documents. Make sure the backend is running.");
@@ -48,10 +45,8 @@ export default function DocumentsPage() {
     fetchDocuments();
   }, [getToken]);
 
-  // Format ISO date string to something human-friendly.
-  // toLocaleDateString uses the user's browser locale automatically.
   const formatDate = (isoString: string) => {
-    return new Date(isoString).toLocaleDateString("en-US", {
+    return new Date(isoString).toLocaleDateString("en-IN", {
       year: "numeric",
       month: "short",
       day: "numeric",
@@ -61,16 +56,13 @@ export default function DocumentsPage() {
   };
 
   const deleteDocument = async (docId: number, filename: string) => {
-    // Simple confirmation — prevents accidental deletes.
-    if (!window.confirm(`Delete "${filename}"? This will also delete all chat history for this document.`)) {
+    if (!window.confirm(`Delete "${filename}"? This will also delete all chat history.`)) {
       return;
     }
-
     setDeleting(docId);
 
     try {
       const token = await getToken();
-
       await axios.delete(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/documents/${docId}`,
         {
@@ -79,9 +71,6 @@ export default function DocumentsPage() {
           },
         }
       );
-
-      // Remove from local state immediately (optimistic UI).
-      // No need to refetch the entire list from the server.
       setDocuments((prev) => prev.filter((doc) => doc.id !== docId));
     } catch (err) {
       setError("Failed to delete document.");
@@ -90,113 +79,160 @@ export default function DocumentsPage() {
     }
   };
 
-  return (
-    <main className="min-h-screen flex flex-col bg-gray-950 text-white">
+  // Filter documents in real time
+  const filteredDocuments = documents.filter((doc) =>
+    doc.filename.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
-      {/* Header bar — consistent with chat page */}
-      <div className="border-b border-gray-800 px-6 py-4 flex items-center justify-between">
-        <div>
-          <h1 className="text-lg font-semibold">My Documents</h1>
-          <p className="text-gray-500 text-xs">
-            {loading ? "Loading..." : `${documents.length} document${documents.length !== 1 ? "s" : ""}`}
-          </p>
+  return (
+    <main className="min-h-screen flex flex-col bg-[#030303] text-neutral-300 relative selection:bg-emerald-500/20 selection:text-emerald-300">
+      
+      {/* Decorative gradients */}
+      <div className="absolute top-0 right-1/4 w-[500px] h-[300px] bg-emerald-500/5 rounded-full blur-[100px] pointer-events-none" />
+
+      {/* Header bar */}
+      <header className="sticky top-0 z-50 backdrop-blur-md bg-[#030303]/75 border-b border-neutral-900/60 px-6 py-4 flex items-center justify-between shrink-0">
+        <div className="flex items-center gap-3">
+          <a href="/" className="w-7 h-7 bg-gradient-to-tr from-emerald-500 to-emerald-400 rounded-lg flex items-center justify-center text-neutral-950 font-black tracking-tight text-xs shadow-md shadow-emerald-500/10">
+            P
+          </a>
+          <div>
+            <h1 className="text-sm font-semibold tracking-tight text-neutral-100 uppercase">My Documents</h1>
+            <p className="text-neutral-500 text-[10px] uppercase tracking-wider">
+              {loading ? "Loading indexing..." : `${documents.length} document${documents.length !== 1 ? "s" : ""} active`}
+            </p>
+          </div>
         </div>
 
         <div className="flex items-center gap-4">
-          <a href="/dashboard"
-            className="text-sm text-gray-400 hover:text-white transition"
+          <a
+            href="/dashboard"
+            className="text-xs text-neutral-400 hover:text-neutral-100 transition duration-300 font-medium"
           >
             ← Upload new
           </a>
           <UserButton />
         </div>
-      </div>
+      </header>
 
       {/* Main content */}
-      <div className="flex-1 px-6 py-6">
+      <div className="flex-1 px-6 py-8 relative">
+        <div className="max-w-2xl mx-auto flex flex-col gap-6">
 
-        {/* Loading state — skeleton cards */}
-        {loading && (
-          <div className="max-w-2xl mx-auto flex flex-col gap-3">
-            {[1, 2, 3].map((i) => (
-              <div
-                key={i}
-                className="bg-gray-900 rounded-xl p-5 animate-pulse"
+          {/* Search bar inside documents list */}
+          {!loading && !error && documents.length > 0 && (
+            <div className="relative">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search through indexed PDFs..."
+                className="w-full bg-neutral-950/50 border border-neutral-900 hover:border-neutral-800 focus:border-neutral-700 rounded-xl px-4 py-2.5 pl-10 text-xs text-neutral-200 outline-none placeholder:text-neutral-600 transition"
+              />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4 text-neutral-600 absolute left-3.5 top-1/2 -translate-y-1/2"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
               >
-                <div className="h-4 bg-gray-800 rounded w-2/3 mb-3"></div>
-                <div className="h-3 bg-gray-800 rounded w-1/3"></div>
-              </div>
-            ))}
-          </div>
-        )}
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+          )}
 
-        {/* Error state */}
-        {error && (
-          <div className="max-w-2xl mx-auto">
-            <p className="text-red-400 text-sm text-center mt-20">{error}</p>
-          </div>
-        )}
+          {/* Loading Skeletons */}
+          {loading && (
+            <div className="flex flex-col gap-3">
+              {[1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  className="bg-neutral-950/40 border border-neutral-900/60 rounded-xl p-5 animate-pulse"
+                >
+                  <div className="h-3.5 bg-neutral-900 rounded w-2/3 mb-2.5"></div>
+                  <div className="h-2 bg-neutral-900 rounded w-1/3"></div>
+                </div>
+              ))}
+            </div>
+          )}
 
-        {/* Empty state — no documents uploaded yet */}
-        {!loading && !error && documents.length === 0 && (
-          <div className="max-w-2xl mx-auto text-center mt-20">
-            <p className="text-gray-500 text-sm mb-4">
-              No documents uploaded yet
+          {/* Error display */}
+          {error && (
+            <p className="text-red-400/80 text-xs text-center py-6 bg-red-950/10 border border-red-900/20 rounded-xl">
+              {error}
             </p>
-            <a
-              href="/dashboard"
-              className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-6 rounded-lg transition text-sm"
-            >
-              Upload your first PDF
-            </a>
-          </div>
-        )}
+          )}
 
-        {/* Document list */}
-        {!loading && !error && documents.length > 0 && (
-          <div className="max-w-2xl mx-auto flex flex-col gap-3">
-            {documents.map((doc) => (
-              <div
-                key={doc.id}
-                className="bg-gray-900 rounded-xl p-5 flex items-center justify-between hover:bg-gray-800/80 transition"
+          {/* Empty state */}
+          {!loading && !error && documents.length === 0 && (
+            <div className="text-center py-16 bg-neutral-950/30 border border-dashed border-neutral-900 rounded-2xl flex flex-col items-center justify-center gap-4">
+              <p className="text-neutral-500 text-xs">
+                No documents uploaded yet
+              </p>
+              <a
+                href="/dashboard"
+                className="bg-emerald-500 hover:bg-emerald-400 text-neutral-950 text-[11px] uppercase tracking-wider font-bold py-2.5 px-6 rounded-lg transition duration-300 shadow shadow-emerald-500/10"
               >
-                <div className="min-w-0 flex-1">
-                  {/* min-w-0 prevents long filenames from overflowing the flex container */}
-                  <p className="text-sm font-medium text-white truncate">
-                    {doc.filename}
-                  </p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Uploaded {formatDate(doc.uploaded_at)}
-                  </p>
-                </div>
+                Upload your first PDF
+              </a>
+            </div>
+          )}
 
-                <div className="flex items-center gap-2 ml-4 shrink-0">
-                  <button
-                    onClick={() => deleteDocument(doc.id, doc.filename)}
-                    disabled={deleting === doc.id}
-                    className="text-gray-500 hover:text-red-400 disabled:opacity-50 transition p-2 rounded-lg hover:bg-gray-800"
-                    title="Delete document"
-                  >
-                    {deleting === doc.id ? (
-                      <span className="text-xs">...</span>
-                    ) : (
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    )}
-                  </button>
-                  <button
-                    onClick={() => router.push(`/chat/${doc.id}`)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded-lg transition"
-                  >
-                    Chat
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+          {/* Filtered empty state */}
+          {!loading && !error && documents.length > 0 && filteredDocuments.length === 0 && (
+            <div className="text-center py-16 bg-neutral-950/30 border border-dashed border-neutral-900 rounded-2xl text-neutral-500 text-xs">
+              No documents match your query &ldquo;{searchQuery}&rdquo;.
+            </div>
+          )}
 
+          {/* Document list */}
+          {!loading && !error && filteredDocuments.length > 0 && (
+            <div className="flex flex-col gap-3">
+              {filteredDocuments.map((doc) => (
+                <div
+                  key={doc.id}
+                  className="bg-neutral-950/40 border border-neutral-900/60 rounded-xl p-4.5 flex items-center justify-between hover:bg-neutral-950/80 hover:border-neutral-800 transition-all duration-300 group transform hover:scale-[1.005]"
+                >
+                  <div className="min-w-0 flex-1 pr-4">
+                    <p className="text-xs font-semibold text-neutral-200 truncate group-hover:text-neutral-100 transition">
+                      {doc.filename}
+                    </p>
+                    <p className="text-[10px] text-neutral-500 mt-1">
+                      Uploaded {formatDate(doc.uploaded_at)}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-3 shrink-0">
+                    {/* Delete doc icon button */}
+                    <button
+                      onClick={() => deleteDocument(doc.id, doc.filename)}
+                      disabled={deleting === doc.id}
+                      className="text-neutral-600 hover:text-red-400 disabled:opacity-30 transition p-2 rounded-lg hover:bg-neutral-900 border border-transparent hover:border-neutral-800/80"
+                      title="Delete document"
+                    >
+                      {deleting === doc.id ? (
+                        <span className="text-[10px] font-mono animate-pulse">...</span>
+                      ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      )}
+                    </button>
+
+                    {/* Chat button */}
+                    <button
+                      onClick={() => router.push(`/chat/${doc.id}`)}
+                      className="bg-emerald-500/10 hover:bg-emerald-500 text-emerald-400 hover:text-neutral-950 border border-emerald-500/20 hover:border-transparent text-xs font-bold py-1.5 px-4 rounded-lg transition duration-300 shadow shadow-emerald-500/5 hover:shadow-emerald-500/20"
+                    >
+                      Chat
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </main>
   );
