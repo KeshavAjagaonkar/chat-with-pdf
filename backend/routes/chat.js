@@ -98,10 +98,24 @@ router.post("/stream", requireAuth, async (req, res) => {
 
             // Parse the SSE data to build the full answer.
             // Each line looks like: "data: some text\n\n"
+            //
+            // We filter out protocol markers ([DONE], [SOURCES], [Error:])
+            // so only the actual LLM response text gets saved to the messages table.
+            // Without this filter, source citations and error messages would be
+            // persisted and shown as garbled text when chat history is reloaded.
             const lines = text.split("\n");
             for (const line of lines) {
-                if (line.startsWith("data: ") && line.trim() !== "data: [DONE]") {
-                    fullAnswer += line.slice(6); // Remove "data: " prefix
+                if (line.startsWith("data: ")) {
+                    const data = line.slice(6); // Remove "data: " prefix
+                    // Skip all protocol markers — only accumulate LLM text.
+                    if (
+                        data === "[DONE]" ||
+                        data.startsWith("[SOURCES]") ||
+                        data.startsWith("[Error:")
+                    ) {
+                        continue;
+                    }
+                    fullAnswer += data;
                 }
             }
         });
