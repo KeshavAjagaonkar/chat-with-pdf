@@ -26,20 +26,23 @@ router.post("/", requireAuth, async (req, res) => {
         const answer = response.data.answer;
 
         try {
-            await Promise.all([
-                axios.post(`${process.env.PYTHON_SERVICE_URL}/messages`, {
-                    document_id,
-                    user_id: userId,
-                    role: "user",
-                    content: question,
-                }),
-                axios.post(`${process.env.PYTHON_SERVICE_URL}/messages`, {
-                    document_id,
-                    user_id: userId,
-                    role: "assistant",
-                    content: answer,
-                }),
-            ]);
+            // MUST be sequential, not Promise.all.
+            // Promise.all sends both requests concurrently — if the assistant
+            // save reaches the DB before the user save, it gets an earlier
+            // created_at timestamp. On reload, ORDER BY created_at ASC puts
+            // the assistant message first → response appears before the question.
+            await axios.post(`${process.env.PYTHON_SERVICE_URL}/messages`, {
+                document_id,
+                user_id: userId,
+                role: "user",
+                content: question,
+            });
+            await axios.post(`${process.env.PYTHON_SERVICE_URL}/messages`, {
+                document_id,
+                user_id: userId,
+                role: "assistant",
+                content: answer,
+            });
         } catch (saveError) {
             console.error("Failed to save messages:", saveError.message);
         }
@@ -123,22 +126,25 @@ router.post("/stream", requireAuth, async (req, res) => {
         response.data.on("end", async () => {
             res.end();
 
-            // Save both messages after the stream completes.
+            // Save messages SEQUENTIALLY after the stream completes.
+            // User message MUST be saved first to guarantee an earlier
+            // created_at timestamp than the assistant message.
+            // Using Promise.all here caused a race condition where the
+            // assistant save could reach the DB first → messages loaded
+            // in wrong order on page reload.
             try {
-                await Promise.all([
-                    axios.post(`${process.env.PYTHON_SERVICE_URL}/messages`, {
-                        document_id,
-                        user_id: userId,
-                        role: "user",
-                        content: question,
-                    }),
-                    axios.post(`${process.env.PYTHON_SERVICE_URL}/messages`, {
-                        document_id,
-                        user_id: userId,
-                        role: "assistant",
-                        content: fullAnswer,
-                    }),
-                ]);
+                await axios.post(`${process.env.PYTHON_SERVICE_URL}/messages`, {
+                    document_id,
+                    user_id: userId,
+                    role: "user",
+                    content: question,
+                });
+                await axios.post(`${process.env.PYTHON_SERVICE_URL}/messages`, {
+                    document_id,
+                    user_id: userId,
+                    role: "assistant",
+                    content: fullAnswer,
+                });
             } catch (saveError) {
                 console.error("Failed to save messages:", saveError.message);
             }
