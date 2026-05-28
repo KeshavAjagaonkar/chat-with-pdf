@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import shutil
 import os
+import json
 
 from pipeline.extract import extract_text_from_pdf
 from pipeline.chunk import chunk_text
@@ -13,6 +14,7 @@ from pipeline.chat import generate_answer, generate_answer_stream
 from db.store import store_document, store_chunks
 from db.search import search_similar_chunks
 from db.query import fetch_user_documents, save_message, fetch_messages, verify_document_owner, delete_document
+from db.setup import run_migrations
 
 app = FastAPI()
 
@@ -20,14 +22,26 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
     allow_methods=["*"],
-    allow_headers=["*"]
+    allow_headers=["*"],
 )
+
+# Run idempotent migrations on startup.
+# This ensures the metadata JSONB column exists on the chunks table
+# without requiring manual SQL on Railway. Safe to run multiple times.
+try:
+    run_migrations()
+except Exception as e:
+    # Log but don't crash — the app can still serve existing data even if
+    # the migration fails (e.g., DB temporarily unreachable at startup).
+    print(f"Migration warning (non-fatal): {e}")
+
 
 class ChatRequest(BaseModel):
     question: str
     document_id: int
     user_id: str = ""
     chat_history: list = []  # Last N messages for conversation context
+
 
 # Pydantic model for message save requests.
 # BaseModel automatically validates that all fields are present
@@ -39,30 +53,49 @@ class MessageRequest(BaseModel):
     role: str
     content: str
 
+
 @app.post("/process")
 async def process_pdf(file: UploadFile = File(...), user_id: str = Form(...)):
+    """
+    Full PDF ingestion pipeline: extract → chunk → embed → store.
+
+    Data flow:
+    1. extract_text_from_pdf → list[dict] with per-page text
+    2. chunk_text → list[dict] with text + page boundaries
+    3. generate_embeddings → list[dict] with text + embedding + metadata
+    4. store_chunks → writes to PostgreSQL (text, embedding, metadata JSONB)
+
+    The temp file is always cleaned up, even if processing fails (finally block).
+    """
     temp_path = f"temp_{file.filename}"
 
-    with open(temp_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
+    try:
+        with open(temp_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
 
-    text = extract_text_from_pdf(temp_path)
-    chunks = chunk_text(text)
-    embedded_chunks = generate_embeddings(chunks)
+        pages = extract_text_from_pdf(temp_path)
+        chunks = chunk_text(pages)
+        embedded_chunks = generate_embeddings(chunks)
 
-    document_id = store_document(file.filename, user_id)
-    store_chunks(document_id, embedded_chunks)
+        document_id = store_document(file.filename, user_id)
+        store_chunks(document_id, embedded_chunks)
 
-    os.remove(temp_path)
+        return {
+            "document_id": document_id,
+            "filename": file.filename,
+            "total_chunks": len(chunks),
+        }
+    finally:
+        # Always clean up the temp file, even if processing fails.
+        # os.path.exists guard prevents FileNotFoundError if the file
+        # was never written (e.g., upload stream failed).
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
 
-    return {
-        "document_id": document_id,
-        "filename": file.filename,
-        "total_chunks": len(chunks)
-    }
 
 @app.post("/chat")
 async def chat(request: ChatRequest):
+    """Non-streaming chat endpoint (kept as fallback)."""
     # Ownership check — prevent users from chatting with documents they don't own.
     # Without this, anyone who guesses a document_id could read someone else's PDF.
     if request.user_id:
@@ -71,12 +104,16 @@ async def chat(request: ChatRequest):
 
     query_embedding = generate_query_embedding(request.question)
     relevant_chunks = search_similar_chunks(query_embedding, request.document_id)
+
+    # relevant_chunks is now list[dict] with text + metadata.
+    # generate_answer accepts this directly — it builds page-labeled context internally.
     answer = generate_answer(request.question, relevant_chunks, request.chat_history)
 
     return {
         "answer": answer,
-        "document_id": request.document_id
+        "document_id": request.document_id,
     }
+
 
 # POST /chat/stream — streaming version of /chat.
 # Returns chunks of the AI answer as Server-Sent Events (SSE).
@@ -94,13 +131,33 @@ async def chat_stream(request: ChatRequest):
 
     def stream_generator():
         try:
+            # Stream the LLM response chunk by chunk.
+            # relevant_chunks (list[dict]) is passed directly to the chat function.
+            # The prompt builder extracts text + page labels internally.
             for chunk in generate_answer_stream(request.question, relevant_chunks, request.chat_history):
                 yield f"data: {chunk}\n\n"
-            # Send source citations — the PDF chunks used to generate the answer.
-            # Format: chunks joined by ||| separator so the frontend can split them.
+
+            # Send source citations as structured JSON.
+            # Format: data: [SOURCES]<json_array>\n\n
+            #
+            # Design decisions:
+            # - JSON instead of |||−separated strings: self-describing, extensible,
+            #   handles edge cases (text containing |||), and the frontend can
+            #   parse it with JSON.parse instead of fragile string splitting.
+            # - Only text and pages are sent (not embeddings or chunk_index)
+            #   to minimize bandwidth.
+            # - Sent BEFORE [DONE] so the frontend can attach sources to the
+            #   message before marking the stream as complete.
             if relevant_chunks:
-                sources_str = "|||".join(relevant_chunks)
-                yield f"data: [SOURCES]{sources_str}\n\n"
+                sources = []
+                for c in relevant_chunks:
+                    sources.append({
+                        "text": c["text"],
+                        "pages": c.get("metadata", {}).get("pages", []),
+                    })
+                sources_json = json.dumps(sources, ensure_ascii=False)
+                yield f"data: [SOURCES]{sources_json}\n\n"
+
             yield "data: [DONE]\n\n"
         except Exception as e:
             yield f"data: [Error: {str(e)}]\n\n"
@@ -112,8 +169,9 @@ async def chat_stream(request: ChatRequest):
         headers={
             "Cache-Control": "no-cache",
             "Connection": "keep-alive",
-        }
+        },
     )
+
 
 # GET /documents?user_id=xxx
 # Returns all documents belonging to a user.
@@ -123,6 +181,7 @@ async def chat_stream(request: ChatRequest):
 async def get_documents(user_id: str):
     documents = fetch_user_documents(user_id)
     return {"documents": documents}
+
 
 # DELETE /documents?document_id=X&user_id=Y
 # Deletes a document and all its chunks + messages.
@@ -135,6 +194,7 @@ async def remove_document(document_id: int, user_id: str):
     delete_document(document_id)
     return {"status": "deleted"}
 
+
 # POST /messages — saves a single message (user or assistant)
 # Called by the Node backend after each chat exchange.
 @app.post("/messages")
@@ -142,12 +202,14 @@ async def post_message(request: MessageRequest):
     save_message(request.document_id, request.user_id, request.role, request.content)
     return {"status": "saved"}
 
+
 # GET /messages?document_id=X&user_id=Y — returns chat history
 # Called when the chat page loads to restore previous conversation.
 @app.get("/messages")
 async def get_messages(document_id: int, user_id: str):
     messages = fetch_messages(document_id, user_id)
     return {"messages": messages}
+
 
 @app.get("/health")
 async def health():
