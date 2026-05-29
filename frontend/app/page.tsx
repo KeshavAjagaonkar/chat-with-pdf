@@ -80,9 +80,14 @@ export default function LandingPage() {
           
           {/* Left — Copy */}
           <div className="max-w-xl">
-            <div className="inline-flex items-center gap-2 bg-zinc-900/90 animate-border-beam text-zinc-400 text-xs px-3 py-1.5 rounded-full mb-6">
-              <Zap className="w-3 h-3 text-amber-400" />
-              Powered by Gemini 2.5 Flash
+            <div className="relative p-[1px] rounded-full overflow-hidden mb-6 inline-flex">
+              {/* Rotating glowing border beam */}
+              <div className="absolute inset-[-1000%] animate-border-spin bg-[conic-gradient(from_90deg_at_50%_50%,#09090b_0%,#09090b_50%,#ffffff_75%,#f59e0b_100%)]" />
+              {/* Inner capsule content */}
+              <div className="relative z-10 flex items-center gap-2 bg-zinc-900 px-3 py-1.5 rounded-full text-zinc-400 text-xs select-none">
+                <Zap className="w-3 h-3 text-amber-400" />
+                Powered by Gemini 2.5 Flash
+              </div>
             </div>
 
             <h1 className="text-4xl md:text-5xl lg:text-[3.25rem] leading-[1.1] font-bold tracking-tight text-white">
