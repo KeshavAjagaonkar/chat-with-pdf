@@ -46,6 +46,7 @@ def create_tables():
             user_id TEXT NOT NULL,
             role TEXT NOT NULL CHECK (role IN ('user', 'assistant')),
             content TEXT NOT NULL,
+            sources JSONB DEFAULT NULL,
             created_at TIMESTAMP DEFAULT NOW()
         );
     """)
@@ -83,6 +84,19 @@ def run_migrations():
         DO $$
         BEGIN
             ALTER TABLE chunks ADD COLUMN metadata JSONB DEFAULT '{}';
+        EXCEPTION
+            WHEN duplicate_column THEN
+                -- Column already exists, nothing to do.
+                NULL;
+        END $$;
+    """)
+
+    # Migration 2: Add sources JSONB column to messages table.
+    # Stores parsed JSON arrays of chunk citations for assistant responses.
+    cursor.execute("""
+        DO $$
+        BEGIN
+            ALTER TABLE messages ADD COLUMN sources JSONB DEFAULT NULL;
         EXCEPTION
             WHEN duplicate_column THEN
                 -- Column already exists, nothing to do.
