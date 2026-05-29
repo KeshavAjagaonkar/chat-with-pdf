@@ -90,48 +90,82 @@ router.post("/stream", requireAuth, async (req, res) => {
             { responseType: "stream" }
         );
 
-        // Collect the full answer while streaming to the frontend.
-        // We need the complete text to save to the messages table.
+        // Collect the full answer and sources while streaming to the frontend.
+        // We need the complete text and source list to save to the messages table.
         let fullAnswer = "";
+        let sources = null;
+        let buffer = "";
 
         response.data.on("data", (chunk) => {
             const text = chunk.toString();
-            // Forward each chunk directly to the frontend
+            // Forward each chunk directly to the frontend instantly
             res.write(text);
 
-            // Parse the SSE data to build the full answer.
-            // Each line looks like: "data: some text\n\n"
-            //
-            // We filter out protocol markers ([DONE], [SOURCES], [Error:])
-            // so only the actual LLM response text gets saved to the messages table.
-            // Without this filter, source citations and error messages would be
-            // persisted and shown as garbled text when chat history is reloaded.
-            const lines = text.split("\n");
-            for (const line of lines) {
-                if (line.startsWith("data: ")) {
-                    const data = line.slice(6); // Remove "data: " prefix
-                    // Skip all protocol markers — only accumulate LLM text.
-                    if (
-                        data === "[DONE]" ||
-                        data.startsWith("[SOURCES]") ||
-                        data.startsWith("[Error:")
-                    ) {
-                        continue;
+            // Buffer the incoming chunks and split by event boundaries to handle TCP packet fragmentation.
+            buffer += text;
+            let boundary = buffer.indexOf("\n\n");
+            while (boundary !== -1) {
+                const event = buffer.slice(0, boundary).trim();
+                buffer = buffer.slice(boundary + 2);
+
+                const lines = event.split("\n");
+                for (const line of lines) {
+                    if (line.startsWith("data: ")) {
+                        const data = line.slice(6); // Remove "data: " prefix
+
+                        if (data === "[DONE]") {
+                            continue;
+                        }
+
+                        if (data.startsWith("[SOURCES]")) {
+                            const rawSources = data.slice(9);
+                            try {
+                                sources = JSON.parse(rawSources);
+                            } catch (e) {
+                                console.error("Failed to parse sources JSON in backend chat stream:", e.message);
+                            }
+                            continue;
+                        }
+
+                        if (data.startsWith("[Error:")) {
+                            continue;
+                        }
+
+                        // Accumulate LLM assistant answer text
+                        fullAnswer += data;
                     }
-                    fullAnswer += data;
                 }
+                boundary = buffer.indexOf("\n\n");
             }
         });
 
         response.data.on("end", async () => {
+            // Process any remaining text in the buffer in case of missing trailing double newlines
+            if (buffer.trim()) {
+                const lines = buffer.split("\n");
+                for (const line of lines) {
+                    if (line.startsWith("data: ")) {
+                        const data = line.slice(6);
+                        if (data === "[DONE]") continue;
+                        if (data.startsWith("[SOURCES]")) {
+                            const rawSources = data.slice(9);
+                            try {
+                                sources = JSON.parse(rawSources);
+                            } catch (e) {
+                                console.error("Failed to parse leftover sources JSON in backend chat stream:", e.message);
+                            }
+                            continue;
+                        }
+                        if (data.startsWith("[Error:")) continue;
+                        fullAnswer += data;
+                    }
+                }
+            }
             res.end();
 
             // Save messages SEQUENTIALLY after the stream completes.
             // User message MUST be saved first to guarantee an earlier
             // created_at timestamp than the assistant message.
-            // Using Promise.all here caused a race condition where the
-            // assistant save could reach the DB first → messages loaded
-            // in wrong order on page reload.
             try {
                 await axios.post(`${process.env.PYTHON_SERVICE_URL}/messages`, {
                     document_id,
@@ -144,6 +178,7 @@ router.post("/stream", requireAuth, async (req, res) => {
                     user_id: userId,
                     role: "assistant",
                     content: fullAnswer,
+                    sources: sources || null,
                 });
             } catch (saveError) {
                 console.error("Failed to save messages:", saveError.message);
