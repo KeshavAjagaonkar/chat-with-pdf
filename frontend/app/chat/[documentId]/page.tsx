@@ -41,7 +41,7 @@ const markdownComponents = {
     </h1>
   ),
   h2: ({ children }: { children?: React.ReactNode }) => (
-    <h2 className="text-base font-semibold text-zinc-105 mt-3 mb-2">
+    <h2 className="text-base font-semibold text-zinc-200 mt-3 mb-2">
       {children}
     </h2>
   ),
@@ -69,7 +69,7 @@ const markdownComponents = {
     <em className="italic text-zinc-300">{children}</em>
   ),
   blockquote: ({ children }: { children?: React.ReactNode }) => (
-    <blockquote className="border-l-2 border-amber-500/50 pl-4 my-3 text-zinc-450 italic">
+    <blockquote className="border-l-2 border-amber-500/50 pl-4 my-3 text-zinc-400 italic">
       {children}
     </blockquote>
   ),
@@ -351,7 +351,7 @@ export default function ChatPage({
             <FileText className="w-5 h-5 text-white" strokeWidth={2} />
             <span className="text-[15px] font-semibold tracking-tight text-white">chat-with-pdf</span>
           </a>
-          <span className="text-zinc-650 text-xs px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 font-medium">
+          <span className="text-zinc-500 text-xs px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 font-medium">
             ID {documentId}
           </span>
         </div>
@@ -381,7 +381,7 @@ export default function ChatPage({
                   className={`max-w-md px-4 py-3 rounded-2xl animate-pulse ${
                     i % 2 === 1
                       ? "bg-zinc-900 border border-zinc-800 self-end"
-                      : "bg-zinc-900/50 border border-zinc-850 self-start"
+                      : "bg-zinc-900/50 border border-zinc-800 self-start"
                   }`}
                 >
                   <div className="h-3 bg-zinc-800 rounded w-48"></div>
@@ -466,7 +466,7 @@ export default function ChatPage({
                                   key={si}
                                   className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-3.5"
                                 >
-                                  <div className="flex items-center gap-2 mb-1.5 font-mono">
+                                  <div className="flex items-center gap-2 mb-1.5 font-sans">
                                     {pageLabel && (
                                       <span className="text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded border border-amber-500/20 font-semibold uppercase tracking-wider">
                                         {pageLabel}
@@ -514,7 +514,7 @@ export default function ChatPage({
           {/* Error message */}
           {error && (
             <div className="flex justify-center">
-              <p className="text-red-400/80 text-xs bg-red-950/20 border border-red-900/20 rounded-lg px-4 py-2 font-mono">
+              <p className="text-red-400/80 text-xs bg-red-950/20 border border-red-900/20 rounded-lg px-4 py-2 font-sans">
                 [Error] {error}
               </p>
             </div>

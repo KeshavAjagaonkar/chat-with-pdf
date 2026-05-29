@@ -122,9 +122,9 @@ export default function DocumentsPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search through indexed PDFs..."
-                className="w-full bg-zinc-900 border border-zinc-800 hover:border-zinc-700 focus:border-zinc-600 rounded-lg px-4 py-2.5 pl-10 text-xs text-white outline-none placeholder:text-zinc-600 transition-colors duration-200"
+                className="w-full bg-zinc-900 border border-zinc-800 hover:border-zinc-700 focus:border-zinc-600 rounded-lg px-4 py-2.5 pl-10 text-xs text-white outline-none placeholder:text-zinc-500 transition-colors duration-200"
               />
-              <Search className="w-4 h-4 text-zinc-650 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
             </div>
           )}
 
@@ -156,7 +156,7 @@ export default function DocumentsPage() {
           {/* Empty state */}
           {!loading && !error && documents.length === 0 && (
             <div className="text-center py-16 bg-zinc-900/40 border border-dashed border-zinc-800 rounded-2xl flex flex-col items-center justify-center gap-4">
-              <p className="text-zinc-500 text-xs font-mono">
+              <p className="text-zinc-500 text-xs font-normal">
                 No documents uploaded yet
               </p>
               <button
@@ -185,7 +185,7 @@ export default function DocumentsPage() {
                   className="bg-zinc-900 border border-zinc-800 rounded-xl px-5 py-4 flex items-center justify-between hover:border-zinc-700 transition-colors duration-200 group"
                 >
                   <div className="min-w-0 flex-1 pr-4 flex items-center gap-3">
-                    <FileText className="w-4 h-4 text-zinc-650 shrink-0" />
+                    <FileText className="w-4 h-4 text-zinc-500 shrink-0" />
                     <div className="min-w-0">
                       <p className="text-sm font-medium text-zinc-200 truncate">
                         {doc.filename}

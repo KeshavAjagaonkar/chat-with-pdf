@@ -85,6 +85,10 @@ input:-webkit-autofill:active {
 
 /* ── Clerk Dark Theme Overrides ─────────────────────────────────────────────
    Override Clerk elements for zinc-black dark mode. */
+.cl-rootBox {
+  font-family: var(--font-inter), system-ui, -apple-system, sans-serif !important;
+}
+
 .cl-card,
 .cl-signIn-start,
 .cl-signUp-start {
@@ -92,6 +96,19 @@ input:-webkit-autofill:active {
   border: 1px solid rgba(255, 255, 255, 0.06) !important;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.9) !important;
 }
+
+/* ── Clerk Auth Container Scoped Overrides ───────────────────────────────
+   When embedded inside the centered two-column card, we strip the Clerk
+   widget's card background, borders, and shadows to prevent nesting clash. */
+.auth-container .cl-card,
+.auth-container .cl-signIn-start,
+.auth-container .cl-signUp-start {
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
 
 .cl-headerTitle {
   color: #fafafa !important;
