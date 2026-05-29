@@ -14,8 +14,15 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Chat with PDF",
-  description: "Upload a PDF and chat with it using AI",
+  title: "DocQuery — Ask your PDFs anything",
+  description:
+    "Upload any PDF and ask questions in plain English. Get cited answers traced to exact pages. Built with Gemini, PGVector, and Next.js.",
+  openGraph: {
+    title: "DocQuery — Ask your PDFs anything",
+    description:
+      "Upload any PDF and get cited answers traced to exact pages.",
+    type: "website",
+  },
 };
 
 export default function RootLayout({

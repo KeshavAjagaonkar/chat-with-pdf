@@ -138,50 +138,48 @@ export default function DashboardPage() {
   );
 
   return (
-    <main className="min-h-screen flex flex-col bg-[#121110] text-neutral-300 relative selection:bg-[#c86a3e]/20 selection:text-neutral-100">
-      
-      {/* Decorative warm radial gradients */}
-      <div className="absolute top-0 right-1/4 w-[500px] h-[300px] bg-[#c86a3e]/3 rounded-full blur-[100px] pointer-events-none" />
-      <div className="absolute bottom-10 left-1/4 w-[400px] h-[300px] bg-[#c86a3e]/2 rounded-full blur-[110px] pointer-events-none" />
+    <main className="min-h-screen flex flex-col bg-[#0f0f0f] text-[#e8e4df] relative selection:bg-[#d4a574]/20 selection:text-white">
 
       {/* Header */}
-      <header className="sticky top-0 z-50 backdrop-blur-md bg-[#121110]/75 border-b border-[#c8b9a6]/15 px-6 py-4 flex items-center justify-between shrink-0">
+      <header className="sticky top-0 z-50 backdrop-blur-xl bg-[#0f0f0f]/80 border-b border-white/[0.06] px-6 md:px-12 py-4 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
-          <a href="/" className="w-7 h-7 bg-[#1a1817] border border-[#c8b9a6]/20 rounded flex items-center justify-center text-[#c86a3e] font-mono font-bold text-xs shadow-sm">
-            $
+          <a href="/" className="flex items-center gap-2.5 group">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#d4a574] to-[#c4886a] flex items-center justify-center shadow-lg shadow-[#d4a574]/10">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#0f0f0f]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 13h6M9 17h4" />
+              </svg>
+            </div>
+            <span className="text-[15px] font-semibold tracking-tight text-white">DocQuery</span>
           </a>
-          <div>
-            <h1 className="text-sm font-mono tracking-tight text-neutral-100 uppercase">Dashboard</h1>
-            <p className="text-neutral-500 text-[10px] uppercase tracking-wider font-mono">Ingest & Manage PDFs</p>
-          </div>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <a
             href="/"
-            className="text-xs text-neutral-500 hover:text-neutral-300 transition duration-300 font-medium"
+            className="text-sm text-[#a09a93] hover:text-white transition-colors duration-200 px-3 py-1.5 rounded-lg hover:bg-white/[0.04]"
           >
-            ← Home
+            Home
           </a>
           <UserButton />
         </div>
       </header>
 
-      {/* Content wrapper */}
+      {/* Content */}
       <div className="flex-1 px-6 py-8 relative">
         <div className="max-w-2xl mx-auto flex flex-col gap-8">
 
-          {/* Upload Section (Sleek custom dotted zone) */}
-          <div className="bg-[#1a1817]/80 border border-[#c8b9a6]/15 rounded-2xl p-6 shadow-xl shadow-black/40 backdrop-blur-sm relative overflow-hidden group hover:border-[#c8b9a6]/25 transition duration-300">
+          {/* Upload Section */}
+          <div className="bg-[#161616] border border-white/[0.06] rounded-xl p-6 hover:border-white/[0.1] transition-colors duration-300">
             
-            <h2 className="text-xs font-bold uppercase tracking-wider text-neutral-400 mb-4 flex items-center gap-2 font-mono">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#e28a5f]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+            <h2 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#d4a574]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
               </svg>
-              Upload PDF Document
+              Upload PDF
             </h2>
 
-            {/* Custom Styled Drag Zone Label */}
-            <div className="border border-dashed border-[#c8b9a6]/15 rounded-xl p-6 flex flex-col items-center justify-center bg-[#121110]/40 hover:bg-[#1a1817]/40 hover:border-[#c86a3e]/30 transition-all duration-300 group cursor-pointer relative">
+            {/* Drop Zone */}
+            <div className="border border-dashed border-white/[0.08] rounded-xl p-6 flex flex-col items-center justify-center bg-[#0f0f0f]/40 hover:bg-white/[0.02] hover:border-[#d4a574]/20 transition-all duration-300 cursor-pointer relative">
               <input
                 id="file-input"
                 type="file"
@@ -190,69 +188,68 @@ export default function DashboardPage() {
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
               />
               
-              <div className="w-10 h-10 bg-[#c86a3e]/10 border border-[#c86a3e]/30 text-[#e28a5f] rounded-full flex items-center justify-center mb-3 group-hover:scale-105 transition-all duration-300">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+              <div className="w-10 h-10 bg-[#d4a574]/10 border border-[#d4a574]/20 text-[#d4a574] rounded-xl flex items-center justify-center mb-3">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
                 </svg>
               </div>
 
-              <span className="text-xs text-neutral-300 font-semibold mb-1 font-sans">Click to select PDF or drag it here</span>
-              <span className="text-[10px] text-neutral-600 font-mono">Supports PDF format up to 10MB</span>
+              <span className="text-sm text-[#c4bfb8] font-medium mb-1">Click to select a PDF or drag it here</span>
+              <span className="text-xs text-[#6b665f]">Up to 10MB per document</span>
             </div>
 
-            {/* Ingest Action Buttons */}
+            {/* Selected file + upload button */}
             {file && (
-              <div className="mt-4 flex items-center justify-between bg-[#121110]/40 border border-[#c8b9a6]/15 rounded-xl px-4 py-2.5 text-xs font-mono">
+              <div className="mt-4 flex items-center justify-between bg-[#0f0f0f]/60 border border-white/[0.06] rounded-lg px-4 py-2.5 text-sm">
                 <div className="flex items-center gap-2 truncate pr-2">
-                  <span className="text-[#e28a5f]">✓</span>
-                  <span className="text-neutral-200 font-medium truncate">{file.name}</span>
-                  <span className="text-neutral-600 text-[10px] shrink-0">({(file.size / (1024 * 1024)).toFixed(2)} MB)</span>
+                  <span className="text-emerald-400 text-xs">✓</span>
+                  <span className="text-white font-medium truncate">{file.name}</span>
+                  <span className="text-[#6b665f] text-xs shrink-0">({(file.size / (1024 * 1024)).toFixed(2)} MB)</span>
                 </div>
                 <button
                   onClick={handleUpload}
                   disabled={uploading}
-                  className="bg-[#f4ebe1] hover:bg-[#faf5ef] text-[#121110] border border-[#d2c3b4] font-bold px-5 py-2 rounded-full transition text-[11px] uppercase tracking-wider shrink-0 disabled:bg-neutral-800 disabled:text-neutral-500 shadow-sm"
+                  className="bg-white text-[#0f0f0f] font-semibold px-5 py-1.5 rounded-lg text-sm transition-all duration-200 hover:bg-[#f0ece7] shrink-0 disabled:bg-[#2a2a2a] disabled:text-[#6b665f] shadow-sm"
                 >
-                  {uploading ? "Parsing..." : "Ingest PDF"}
+                  {uploading ? "Uploading..." : "Upload"}
                 </button>
               </div>
             )}
 
             {uploadError && (
-              <p className="text-red-400/80 text-xs mt-3 bg-red-950/20 border border-red-900/20 px-3 py-1.5 rounded-lg font-mono">
+              <p className="text-red-400/80 text-sm mt-3 bg-red-950/20 border border-red-900/20 px-3 py-1.5 rounded-lg">
                 {uploadError}
               </p>
             )}
           </div>
 
-          {/* Documents Section (With integrated real-time search) */}
+          {/* Documents Section */}
           <div className="flex flex-col gap-4">
             
-            {/* Header + Search bar layout */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#c8b9a6]/15 pb-3">
-              <h2 className="text-xs font-bold uppercase tracking-wider text-neutral-400 flex items-center gap-2 font-mono">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#e28a5f]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            {/* Header + Search */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-white/[0.06]">
+              <h2 className="text-sm font-semibold text-white flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#d4a574]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" />
                 </svg>
-                Your Documents
+                Your documents
                 {!loading && (
-                  <span className="text-neutral-600 font-normal">({filteredDocuments.length})</span>
+                  <span className="text-[#6b665f] font-normal text-xs">({filteredDocuments.length})</span>
                 )}
               </h2>
 
-              {/* Dynamic search input field */}
               {documents.length > 0 && (
-                <div className="relative w-full sm:w-60">
+                <div className="relative w-full sm:w-56">
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search documents..."
-                    className="w-full bg-[#1a1817]/50 border border-[#c8b9a6]/15 hover:border-[#c8b9a6]/25 focus:border-[#c86a3e]/40 rounded-full px-3.5 py-1.5 pl-8 text-xs text-neutral-200 outline-none placeholder:text-neutral-600 transition"
+                    className="w-full bg-[#161616] border border-white/[0.06] hover:border-white/[0.1] focus:border-[#d4a574]/30 rounded-lg px-3.5 py-2 pl-9 text-sm text-white outline-none placeholder:text-[#6b665f] transition-colors duration-200"
                   />
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-3.5 w-3.5 text-neutral-600 absolute left-3 top-1/2 -translate-y-1/2"
+                    className="h-4 w-4 text-[#6b665f] absolute left-3 top-1/2 -translate-y-1/2"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -268,72 +265,72 @@ export default function DashboardPage() {
             {loading && (
               <div className="flex flex-col gap-3">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="bg-[#1a1817]/40 border border-[#c8b9a6]/15 rounded-xl p-5 animate-pulse flex items-center justify-between">
+                  <div key={i} className="bg-[#161616] border border-white/[0.06] rounded-xl p-5 animate-pulse flex items-center justify-between">
                     <div className="flex-1">
-                      <div className="h-3 bg-neutral-900 rounded w-2/3 mb-2.5"></div>
-                      <div className="h-2 bg-neutral-900 rounded w-1/3"></div>
+                      <div className="h-3 bg-[#1c1c1c] rounded w-2/3 mb-2.5" />
+                      <div className="h-2 bg-[#1c1c1c] rounded w-1/3" />
                     </div>
-                    <div className="h-7 bg-neutral-900 rounded w-16"></div>
+                    <div className="h-7 bg-[#1c1c1c] rounded w-16" />
                   </div>
                 ))}
               </div>
             )}
 
             {/* Error display */}
-            {error && <p className="text-red-400/80 text-xs text-center py-6 bg-red-950/10 border border-red-900/20 rounded-xl font-mono">{error}</p>}
+            {error && <p className="text-red-400/80 text-sm text-center py-6 bg-red-950/10 border border-red-900/20 rounded-xl">{error}</p>}
 
             {/* Empty state */}
             {!loading && !error && documents.length === 0 && (
-              <div className="text-center py-16 bg-[#1a1817]/30 border border-dashed border-[#c8b9a6]/15 rounded-2xl text-neutral-500 text-xs leading-relaxed font-mono">
-                No documents indexed yet. Upload and ingest your first PDF above!
+              <div className="text-center py-16 bg-[#161616]/50 border border-dashed border-white/[0.06] rounded-xl text-[#6b665f] text-sm">
+                No documents yet. Upload your first PDF above.
               </div>
             )}
 
             {/* Filtered empty state */}
             {!loading && !error && documents.length > 0 && filteredDocuments.length === 0 && (
-              <div className="text-center py-16 bg-[#1a1817]/30 border border-dashed border-[#c8b9a6]/15 rounded-2xl text-neutral-500 text-xs leading-relaxed font-mono">
-                No documents match your search query &ldquo;{searchQuery}&rdquo;.
+              <div className="text-center py-16 bg-[#161616]/50 border border-dashed border-white/[0.06] rounded-xl text-[#6b665f] text-sm">
+                No documents match &ldquo;{searchQuery}&rdquo;
               </div>
             )}
 
             {/* Document list */}
             {!loading && !error && filteredDocuments.length > 0 && (
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-2">
                 {filteredDocuments.map((doc) => (
                   <div
                     key={doc.id}
-                    className="bg-[#1a1817]/40 border border-[#c8b9a6]/15 rounded-xl p-4.5 flex items-center justify-between hover:bg-[#1a1817]/80 hover:border-[#c8b9a6]/25 transition-all duration-300 group transform hover:scale-[1.005]"
+                    className="bg-[#161616] border border-white/[0.06] rounded-xl px-5 py-4 flex items-center justify-between hover:border-white/[0.1] transition-all duration-200 group"
                   >
                     <div className="min-w-0 flex-1 pr-4">
-                      <p className="text-xs font-semibold text-neutral-200 truncate group-hover:text-neutral-100 transition">
+                      <p className="text-sm font-medium text-white truncate group-hover:text-white transition">
                         {doc.filename}
                       </p>
-                      <p className="text-[10px] text-neutral-500 mt-1 font-mono">
-                        Indexed {formatDate(doc.uploaded_at)}
+                      <p className="text-xs text-[#6b665f] mt-1">
+                        Uploaded {formatDate(doc.uploaded_at)}
                       </p>
                     </div>
 
-                    <div className="flex items-center gap-3 shrink-0">
-                      {/* Delete doc icon button */}
+                    <div className="flex items-center gap-2 shrink-0">
+                      {/* Delete button */}
                       <button
                         onClick={() => deleteDocument(doc.id, doc.filename)}
                         disabled={deleting === doc.id}
-                        className="text-neutral-600 hover:text-red-400 disabled:opacity-30 transition p-2 rounded-lg hover:bg-[#121110] border border-transparent hover:border-[#c8b9a6]/15"
+                        className="text-[#4a453f] hover:text-red-400 disabled:opacity-30 transition-colors duration-200 p-2 rounded-lg hover:bg-white/[0.03]"
                         title="Delete document"
                       >
                         {deleting === doc.id ? (
-                          <span className="text-[10px] font-mono animate-pulse">...</span>
+                          <span className="text-xs animate-pulse">...</span>
                         ) : (
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
                           </svg>
                         )}
                       </button>
 
-                      {/* Chat capsule button */}
+                      {/* Chat button */}
                       <button
                         onClick={() => router.push(`/chat/${doc.id}`)}
-                        className="bg-[#c86a3e]/10 hover:bg-[#c86a3e] text-[#e28a5f] hover:text-neutral-950 border border-[#c86a3e]/20 hover:border-transparent text-xs font-bold py-1.5 px-5 rounded-full transition duration-300 shadow shadow-[#c86a3e]/5 hover:shadow-[#c86a3e]/20"
+                        className="bg-white/[0.06] hover:bg-white text-[#c4bfb8] hover:text-[#0f0f0f] border border-white/[0.06] hover:border-transparent text-sm font-semibold py-1.5 px-5 rounded-lg transition-all duration-200"
                       >
                         Chat
                       </button>
