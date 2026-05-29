@@ -2,7 +2,7 @@ import psycopg2
 import json
 from db.pool import connection_pool
 
-def search_similar_chunks(query_embedding: list[float], document_id: int, top_k: int = 4) -> list[dict]:
+def search_similar_chunks(query_embedding: list[float], document_id: int, top_k: int = 8) -> list[dict]:
     """
     Finds the most semantically similar chunks to a query using ThreadedConnectionPool.
     """
