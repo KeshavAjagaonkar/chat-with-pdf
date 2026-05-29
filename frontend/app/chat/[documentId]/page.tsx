@@ -5,6 +5,7 @@ import { use } from "react";
 import axios from "axios";
 import { UserButton, useAuth } from "@clerk/nextjs";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { FileText, Sparkles, Send, Loader2, ArrowLeft, ChevronRight, MessageSquare } from "lucide-react";
 
 // ─── Type Contracts ───────────────────────────────────────────────────────────
@@ -116,6 +117,38 @@ const markdownComponents = {
     >
       {children}
     </a>
+  ),
+  table: ({ children }: { children?: React.ReactNode }) => (
+    <div className="overflow-x-auto my-4 border border-zinc-800 rounded-xl bg-zinc-900/30 backdrop-blur-sm shadow-[0_4px_16px_rgba(0,0,0,0.3)]">
+      <table className="min-w-full divide-y divide-zinc-800 text-left border-collapse text-xs md:text-sm">
+        {children}
+      </table>
+    </div>
+  ),
+  thead: ({ children }: { children?: React.ReactNode }) => (
+    <thead className="bg-zinc-900/80 text-zinc-200 uppercase tracking-wider font-semibold text-[10px] md:text-xs">
+      {children}
+    </thead>
+  ),
+  tbody: ({ children }: { children?: React.ReactNode }) => (
+    <tbody className="divide-y divide-zinc-800 bg-transparent text-zinc-300">
+      {children}
+    </tbody>
+  ),
+  tr: ({ children }: { children?: React.ReactNode }) => (
+    <tr className="hover:bg-zinc-800/10 transition-colors duration-150">
+      {children}
+    </tr>
+  ),
+  th: ({ children }: { children?: React.ReactNode }) => (
+    <th className="px-4 py-3 font-semibold border-b border-zinc-800">
+      {children}
+    </th>
+  ),
+  td: ({ children }: { children?: React.ReactNode }) => (
+    <td className="px-4 py-3 leading-relaxed border-b border-zinc-800/50">
+      {children}
+    </td>
   ),
 };
 
@@ -445,7 +478,7 @@ export default function ChatPage({
 
                       {/* Render markdown for ALL states (streaming + final). */}
                       <div className="text-sm leading-relaxed text-zinc-350 prose-chat font-sans">
-                        <ReactMarkdown components={markdownComponents}>
+                        <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
                           {msg.content}
                         </ReactMarkdown>
 
