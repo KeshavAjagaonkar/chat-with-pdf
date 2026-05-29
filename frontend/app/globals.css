@@ -1,28 +1,24 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #09090b;
+  --foreground: #fafafa;
+  --card: #18181b;
+  --card-border: rgba(255, 255, 255, 0.06);
+  --muted: #71717a;
+  --accent: #f59e0b; /* Unified Amber Accent */
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0f0f0f;
-    --foreground: #e8e4df;
-  }
+  --font-sans: var(--font-inter);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
 }
 
 /* ── Streaming cursor blink ─────────────────────────────────────────────────
@@ -38,8 +34,7 @@ body {
 }
 
 /* ── Thinking dots animation ────────────────────────────────────────────────
-   Adds dots progressively: "Thinking" → "Thinking." → "Thinking.." → "Thinking..."
-   Creates a natural "working on it" feel without a spinner. */
+   Adds dots progressively for the "working on it" feel. */
 @keyframes thinking-dots {
   0%   { content: ""; }
   25%  { content: "."; }
@@ -53,7 +48,7 @@ body {
   animation: thinking-dots 1.5s steps(4, end) infinite;
 }
 
-/* ── Subtle grid background (used on chat and dashboard pages) ──────────── */
+/* ── Subtle grid background (chat and dashboard pages) ──────────────────── */
 .bg-grid-pattern {
   background-size: 48px 48px;
   background-image: 
@@ -61,20 +56,36 @@ body {
     linear-gradient(to bottom, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
 }
 
-/* ── Clerk High-Legibility Dark Theme Overrides ─────────────────────────────
-   Provides explicit CSS overrides targeting Clerk elements to guarantee
-   maximum text legibility and contrast against dark backgrounds. */
+/* ── Autofill & Input Readability Overrides ─────────────────────────────────
+   Ensures text in fields is ALWAYS high contrast and perfectly visible,
+   even during browser auto-fill event chains. */
+input, select, textarea, .cl-formFieldInput {
+  color: #fafafa !important;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+  -webkit-text-fill-color: #fafafa !important;
+  -webkit-box-shadow: 0 0 0px 1000px #09090b inset !important;
+  box-shadow: 0 0 0px 1000px #09090b inset !important;
+  transition: background-color 5000s ease-in-out 0s !important;
+}
+
+/* ── Clerk Dark Theme Overrides ─────────────────────────────────────────────
+   Override Clerk elements for zinc-black dark mode. */
 .cl-card,
 .cl-signIn-start,
 .cl-signUp-start {
-  background-color: #161616 !important;
+  background-color: #18181b !important;
   border: 1px solid rgba(255, 255, 255, 0.06) !important;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8) !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.9) !important;
 }
 
 .cl-headerTitle {
-  color: #f4f4f5 !important;
-  font-weight: 700 !important;
+  color: #fafafa !important;
+  font-weight: 600 !important;
   font-size: 1.25rem !important;
 }
 
@@ -83,20 +94,20 @@ body {
 }
 
 .cl-socialButtonsBlockButton {
-  background-color: #0f0f0f !important;
+  background-color: #09090b !important;
   border: 1px solid rgba(255, 255, 255, 0.06) !important;
   color: #e4e4e7 !important;
   transition: all 0.2s ease !important;
 }
 
 .cl-socialButtonsBlockButton:hover {
-  background-color: #1c1c1c !important;
+  background-color: #27272a !important;
   color: #ffffff !important;
 }
 
 .cl-socialButtonsBlockButtonText {
   color: #e4e4e7 !important;
-  font-weight: 600 !important;
+  font-weight: 500 !important;
 }
 
 .cl-dividerLine {
@@ -104,43 +115,41 @@ body {
 }
 
 .cl-dividerText {
-  color: #6b665f !important;
-  font-size: 10px !important;
-  font-weight: 700 !important;
+  color: #71717a !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
   text-transform: uppercase !important;
   letter-spacing: 0.05em !important;
 }
 
 .cl-formFieldLabel {
   color: #d4d4d8 !important;
-  font-weight: 600 !important;
+  font-weight: 500 !important;
 }
 
 .cl-formFieldInput {
-  background-color: #0f0f0f !important;
+  background-color: #09090b !important;
   border: 1px solid rgba(255, 255, 255, 0.06) !important;
-  color: #f4f4f5 !important;
+  color: #fafafa !important;
   transition: all 0.2s ease !important;
 }
 
 .cl-formFieldInput:focus {
-  border-color: rgba(212, 165, 116, 0.4) !important;
-  box-shadow: 0 0 0 2px rgba(212, 165, 116, 0.1) !important;
+  border-color: rgba(245, 158, 11, 0.4) !important;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.08) !important;
 }
 
 .cl-formButtonPrimary {
-  background-color: #ffffff !important;
-  color: #0f0f0f !important;
-  font-weight: 700 !important;
-  letter-spacing: 0.01em !important;
+  background-color: #fafafa !important;
+  color: #09090b !important;
+  font-weight: 600 !important;
   border: none !important;
   border-radius: 8px !important;
   transition: all 0.2s ease !important;
 }
 
 .cl-formButtonPrimary:hover {
-  background-color: #f0ece7 !important;
-  transform: translateY(-0.5px) !important;
+  background-color: #e4e4e7 !important;
 }
 
 .cl-footerActionText {
@@ -148,24 +157,23 @@ body {
 }
 
 .cl-footerActionLink {
-  color: #d4a574 !important;
-  font-weight: 700 !important;
+  color: #f59e0b !important;
+  font-weight: 600 !important;
   text-decoration: underline !important;
   text-underline-offset: 4px !important;
   transition: all 0.2s ease !important;
 }
 
 .cl-footerActionLink:hover {
-  color: #e2b88a !important;
+  color: #fbbf24 !important;
 }
 
-/* Ensure Google and other auth icon buttons have clean contrast */
 .cl-socialButtonsIconButton {
-  background-color: #0f0f0f !important;
+  background-color: #09090b !important;
   border: 1px solid rgba(255, 255, 255, 0.06) !important;
   color: #e4e4e7 !important;
 }
 
 .cl-socialButtonsIconButton:hover {
-  background-color: #1c1c1c !important;
+  background-color: #27272a !important;
 }

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { useAuth, UserButton } from "@clerk/nextjs";
+import { FileText, Search, Trash2, MessageSquare, Home, Upload } from "lucide-react";
 
 interface Document {
   id: number;
@@ -85,31 +86,25 @@ export default function DocumentsPage() {
   );
 
   return (
-    <main className="min-h-screen flex flex-col bg-[#121110] text-neutral-300 relative selection:bg-[#c86a3e]/20 selection:text-neutral-100">
+    <main className="min-h-screen flex flex-col bg-zinc-950 text-zinc-100 relative selection:bg-amber-500/20 selection:text-white">
       
       {/* Decorative gradients */}
-      <div className="absolute top-0 right-1/4 w-[500px] h-[300px] bg-[#c86a3e]/3 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute top-0 right-1/4 w-[500px] h-[300px] bg-amber-500/2 rounded-full blur-[100px] pointer-events-none" />
 
       {/* Header bar */}
-      <header className="sticky top-0 z-50 backdrop-blur-md bg-[#121110]/75 border-b border-[#c8b9a6]/15 px-6 py-4 flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-3">
-          <a href="/" className="w-7 h-7 bg-[#1a1817] border border-[#c8b9a6]/20 rounded flex items-center justify-center text-[#c86a3e] font-mono font-bold text-xs shadow-sm">
-            $
-          </a>
-          <div>
-            <h1 className="text-sm font-mono tracking-tight text-neutral-100 uppercase">My Documents</h1>
-            <p className="text-neutral-500 text-[10px] uppercase tracking-wider font-mono">
-              {loading ? "Loading indexing..." : `${documents.length} document${documents.length !== 1 ? "s" : ""} active`}
-            </p>
-          </div>
-        </div>
+      <header className="sticky top-0 z-50 backdrop-blur-xl bg-zinc-950/80 border-b border-zinc-800/50 px-6 py-4 flex items-center justify-between shrink-0">
+        <a href="/" className="flex items-center gap-2.5">
+          <FileText className="w-5 h-5 text-white" strokeWidth={2} />
+          <span className="text-[15px] font-semibold tracking-tight text-white">chat-with-pdf</span>
+        </a>
 
         <div className="flex items-center gap-4">
           <a
             href="/dashboard"
-            className="text-xs text-[#e28a5f] hover:text-[#f3a87f] transition duration-300 font-medium font-mono"
+            className="text-xs text-zinc-400 hover:text-white transition duration-200 font-medium flex items-center gap-1"
           >
-            ← Upload new
+            <Upload className="w-3.5 h-3.5" />
+            Upload new
           </a>
           <UserButton />
         </div>
@@ -127,18 +122,9 @@ export default function DocumentsPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search through indexed PDFs..."
-                className="w-full bg-[#1a1817]/50 border border-[#c8b9a6]/15 hover:border-[#c8b9a6]/25 focus:border-[#c86a3e]/40 rounded-full px-4 py-2.5 pl-10 text-xs text-neutral-200 outline-none placeholder:text-neutral-600 transition"
+                className="w-full bg-zinc-900 border border-zinc-800 hover:border-zinc-700 focus:border-zinc-600 rounded-lg px-4 py-2.5 pl-10 text-xs text-white outline-none placeholder:text-zinc-600 transition-colors duration-200"
               />
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4 text-neutral-600 absolute left-3.5 top-1/2 -translate-y-1/2"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
+              <Search className="w-4 h-4 text-zinc-650 absolute left-3.5 top-1/2 -translate-y-1/2" />
             </div>
           )}
 
@@ -148,10 +134,13 @@ export default function DocumentsPage() {
               {[1, 2, 3].map((i) => (
                 <div
                   key={i}
-                  className="bg-[#1a1817]/40 border border-[#c8b9a6]/15 rounded-xl p-5 animate-pulse"
+                  className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 animate-pulse flex items-center justify-between"
                 >
-                  <div className="h-3.5 bg-neutral-900 rounded w-2/3 mb-2.5"></div>
-                  <div className="h-2 bg-neutral-900 rounded w-1/3"></div>
+                  <div className="flex-1">
+                    <div className="h-3.5 bg-zinc-800 rounded w-2/3 mb-2.5"></div>
+                    <div className="h-2 bg-zinc-800 rounded w-1/3"></div>
+                  </div>
+                  <div className="h-7 bg-zinc-800 rounded w-16"></div>
                 </div>
               ))}
             </div>
@@ -159,29 +148,30 @@ export default function DocumentsPage() {
 
           {/* Error display */}
           {error && (
-            <p className="text-red-400/80 text-xs text-center py-6 bg-red-950/10 border border-red-900/20 rounded-xl font-mono">
+            <p className="text-red-400/80 text-xs text-center py-6 bg-red-950/10 border border-red-900/20 rounded-xl">
               {error}
             </p>
           )}
 
           {/* Empty state */}
           {!loading && !error && documents.length === 0 && (
-            <div className="text-center py-16 bg-[#1a1817]/30 border border-dashed border-[#c8b9a6]/15 rounded-2xl flex flex-col items-center justify-center gap-4">
-              <p className="text-neutral-500 text-xs font-mono">
+            <div className="text-center py-16 bg-zinc-900/40 border border-dashed border-zinc-800 rounded-2xl flex flex-col items-center justify-center gap-4">
+              <p className="text-zinc-500 text-xs font-mono">
                 No documents uploaded yet
               </p>
-              <a
-                href="/dashboard"
-                className="bg-[#f4ebe1] hover:bg-[#faf5ef] text-[#121110] border border-[#d2c3b4] text-[11px] uppercase tracking-wider font-bold py-2.5 px-6 rounded-full transition duration-300 shadow-sm"
+              <button
+                onClick={() => router.push("/dashboard")}
+                className="bg-zinc-100 text-zinc-900 font-medium px-5 py-2 rounded-lg hover:bg-white transition-all duration-200 text-xs flex items-center gap-1.5"
               >
+                <Upload className="w-3.5 h-3.5" />
                 Upload your first PDF
-              </a>
+              </button>
             </div>
           )}
 
           {/* Filtered empty state */}
           {!loading && !error && documents.length > 0 && filteredDocuments.length === 0 && (
-            <div className="text-center py-16 bg-[#1a1817]/30 border border-dashed border-[#c8b9a6]/15 rounded-2xl text-neutral-500 text-xs font-mono">
+            <div className="text-center py-16 bg-zinc-900/40 border border-dashed border-zinc-800 rounded-2xl text-zinc-500 text-xs">
               No documents match your query &ldquo;{searchQuery}&rdquo;.
             </div>
           )}
@@ -192,39 +182,41 @@ export default function DocumentsPage() {
               {filteredDocuments.map((doc) => (
                 <div
                   key={doc.id}
-                  className="bg-[#1a1817]/40 border border-[#c8b9a6]/15 rounded-xl p-4.5 flex items-center justify-between hover:bg-[#1a1817]/80 hover:border-[#c8b9a6]/25 transition-all duration-300 group transform hover:scale-[1.005]"
+                  className="bg-zinc-900 border border-zinc-800 rounded-xl px-5 py-4 flex items-center justify-between hover:border-zinc-700 transition-colors duration-200 group"
                 >
-                  <div className="min-w-0 flex-1 pr-4">
-                    <p className="text-xs font-semibold text-neutral-200 truncate group-hover:text-neutral-100 transition">
-                      {doc.filename}
-                    </p>
-                    <p className="text-[10px] text-neutral-500 mt-1 font-mono">
-                      Uploaded {formatDate(doc.uploaded_at)}
-                    </p>
+                  <div className="min-w-0 flex-1 pr-4 flex items-center gap-3">
+                    <FileText className="w-4 h-4 text-zinc-650 shrink-0" />
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-zinc-200 truncate">
+                        {doc.filename}
+                      </p>
+                      <p className="text-xs text-zinc-500 mt-0.5">
+                        Uploaded {formatDate(doc.uploaded_at)}
+                      </p>
+                    </div>
                   </div>
 
-                  <div className="flex items-center gap-3 shrink-0">
+                  <div className="flex items-center gap-2.5 shrink-0">
                     {/* Delete doc icon button */}
                     <button
                       onClick={() => deleteDocument(doc.id, doc.filename)}
                       disabled={deleting === doc.id}
-                      className="text-neutral-600 hover:text-red-400 disabled:opacity-30 transition p-2 rounded-lg hover:bg-[#121110] border border-transparent hover:border-[#c8b9a6]/15"
+                      className="text-zinc-600 hover:text-red-400 disabled:opacity-30 transition p-2 rounded-lg hover:bg-zinc-800/50"
                       title="Delete document"
                     >
                       {deleting === doc.id ? (
-                        <span className="text-[10px] font-mono animate-pulse">...</span>
+                        <span className="text-[10px] animate-pulse">...</span>
                       ) : (
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
+                        <Trash2 className="w-4 h-4" />
                       )}
                     </button>
 
                     {/* Chat capsule button */}
                     <button
                       onClick={() => router.push(`/chat/${doc.id}`)}
-                      className="bg-[#c86a3e]/10 hover:bg-[#c86a3e] text-[#e28a5f] hover:text-neutral-950 border border-[#c86a3e]/20 hover:border-transparent text-xs font-bold py-1.5 px-5 rounded-full transition duration-300 shadow shadow-[#c86a3e]/5 hover:shadow-[#c86a3e]/20"
+                      className="bg-zinc-800 hover:bg-zinc-100 text-zinc-300 hover:text-zinc-900 border border-zinc-700/50 hover:border-transparent text-sm font-medium py-1.5 px-4 rounded-lg transition-all duration-200 flex items-center gap-1.5"
                     >
+                      <MessageSquare className="w-3.5 h-3.5" />
                       Chat
                     </button>
                   </div>

@@ -1,26 +1,22 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "DocQuery — Ask your PDFs anything",
+  title: "chat-with-pdf",
   description:
-    "Upload any PDF and ask questions in plain English. Get cited answers traced to exact pages. Built with Gemini, PGVector, and Next.js.",
+    "Upload any PDF and chat with it. Get answers with exact page citations.",
   openGraph: {
-    title: "DocQuery — Ask your PDFs anything",
+    title: "chat-with-pdf",
     description:
-      "Upload any PDF and get cited answers traced to exact pages.",
+      "Upload any PDF and chat with it. Get answers with exact page citations.",
     type: "website",
   },
 };
@@ -32,8 +28,8 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
-        <body className="min-h-full flex flex-col">{children}</body>
+      <html lang="en" className={`${inter.variable} h-full antialiased`}>
+        <body className="min-h-full flex flex-col font-sans">{children}</body>
       </html>
     </ClerkProvider>
   );
