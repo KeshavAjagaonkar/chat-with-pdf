@@ -10,7 +10,9 @@ try:
     # Initialize connection pool for high-performance Redis socket re-use
     redis_pool = redis.ConnectionPool.from_url(REDIS_URL, decode_responses=True)
     redis_client = redis.Redis(connection_pool=redis_pool)
-    logger.info("Redis Connection Pool initialized successfully")
+    # Test connection immediately to fail fast and fall back if Redis is down/unreachable
+    redis_client.ping()
+    logger.info("Redis Connection Pool initialized and verified successfully")
 except Exception as e:
-    logger.error(f"Failed to connect to Redis: {e}")
+    logger.error(f"Failed to connect to Redis: {e}. Falling back to non-cached execution mode.")
     redis_client = None # Graceful fallback if Redis is down
