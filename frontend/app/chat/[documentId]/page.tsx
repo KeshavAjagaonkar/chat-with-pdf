@@ -15,6 +15,7 @@ import { FileText, Sparkles, Send, Loader2, ArrowLeft, ChevronRight, MessageSqua
 interface Source {
   text: string;
   pages: number[];
+  filename?: string;
 }
 
 interface Message {
@@ -119,10 +120,16 @@ const markdownComponents = {
 };
 
 // ─── Helper: format page label from Source ─────────────────────────────────────
-function formatPageLabel(pages: number[]): string | null {
-  if (!pages || pages.length === 0) return null;
-  if (pages.length === 1) return `Page ${pages[0]}`;
-  return `Pages ${pages[0]}–${pages[pages.length - 1]}`;
+function formatPageLabel(pages: number[], filename?: string): string | null {
+  if (!pages || pages.length === 0) {
+    if (filename) return filename;
+    return null;
+  }
+  const pagesStr = pages.length === 1 ? `Page ${pages[0]}` : `Pages ${pages[0]}–${pages[pages.length - 1]}`;
+  if (filename) {
+    return `${pagesStr} of ${filename}`;
+  }
+  return pagesStr;
 }
 
 // ─── Main Component ───────────────────────────────────────────────────────────
@@ -460,7 +467,7 @@ export default function ChatPage({
 
                           <div className="mt-2 space-y-2 pl-0.5">
                             {msg.sources.map((src, si) => {
-                              const pageLabel = formatPageLabel(src.pages);
+                              const pageLabel = formatPageLabel(src.pages, src.filename);
                               return (
                                 <div
                                   key={si}

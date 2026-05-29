@@ -13,6 +13,7 @@ import {
   FolderOpen,
   Home,
   FileUp,
+  Loader2,
 } from "lucide-react";
 
 interface Document {
@@ -26,9 +27,11 @@ export default function DashboardPage() {
   const router = useRouter();
 
   // Upload state
-  const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
+  const [pollingDocId, setPollingDocId] = useState<number | null>(null);
+  const [progressState, setProgressState] = useState<{ status: string; progress: number } | null>(null);
 
   // Documents state
   const [documents, setDocuments] = useState<Document[]>([]);
@@ -60,6 +63,53 @@ export default function DashboardPage() {
     fetchDocuments();
   }, [getToken]);
 
+  // Polling for processing progress
+  useEffect(() => {
+    if (pollingDocId === null) return;
+
+    let intervalId: NodeJS.Timeout;
+    const pollStatus = async () => {
+      try {
+        const token = await getToken();
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/documents/status/${pollingDocId}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        const data = response.data;
+        if (data.status === "completed" || data.progress === 100) {
+          setPollingDocId(null);
+          setUploading(false);
+          setProgressState(null);
+          
+          // Re-fetch final documents list to include the newly ingested multi-file document
+          const docsResponse = await axios.get(
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/documents`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          setDocuments(docsResponse.data.documents);
+        } else if (data.status === "failed") {
+          setPollingDocId(null);
+          setUploading(false);
+          setUploadError(data.error || "Document processing failed. Please check file formatting.");
+          setProgressState(null);
+        } else {
+          setProgressState({
+            status: data.status,
+            progress: data.progress,
+          });
+        }
+      } catch (err) {
+        console.error("Error polling document status:", err);
+      }
+    };
+
+    pollStatus();
+    intervalId = setInterval(pollStatus, 1500);
+
+    return () => clearInterval(intervalId);
+  }, [pollingDocId, getToken]);
+
   const formatDate = (isoString: string) => {
     return new Date(isoString).toLocaleDateString("en-IN", {
       year: "numeric",
@@ -71,32 +121,52 @@ export default function DashboardPage() {
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selected = e.target.files?.[0];
-    if (selected) {
-      if (selected.type !== "application/pdf") {
-        setUploadError("Only PDF files are allowed.");
-        setFile(null);
+    const selectedFiles = e.target.files;
+    if (selectedFiles) {
+      const validFiles: File[] = [];
+      let errMessage = "";
+
+      if (selectedFiles.length > 5) {
+        setUploadError("You can upload a maximum of 5 files at a time.");
+        setFiles([]);
         return;
       }
-      if (selected.size > MAX_FILE_SIZE) {
-        setUploadError("File must be under 10MB.");
-        setFile(null);
-        return;
+
+      for (let i = 0; i < selectedFiles.length; i++) {
+        const file = selectedFiles[i];
+        if (file.type !== "application/pdf") {
+          errMessage = `"${file.name}" is not a PDF file.`;
+          break;
+        }
+        if (file.size > MAX_FILE_SIZE) {
+          errMessage = `"${file.name}" exceeds the 10MB size limit.`;
+          break;
+        }
+        validFiles.push(file);
       }
-      setFile(selected);
-      setUploadError("");
+
+      if (errMessage) {
+        setUploadError(errMessage);
+        setFiles([]);
+      } else {
+        setFiles(validFiles);
+        setUploadError("");
+      }
     }
   };
 
   const handleUpload = async () => {
-    if (!file) return;
+    if (files.length === 0) return;
     setUploading(true);
     setUploadError("");
+    setProgressState({ status: "uploading", progress: 5 });
 
     try {
       const token = await getToken();
       const formData = new FormData();
-      formData.append("file", file);
+      files.forEach((f) => {
+        formData.append("files", f);
+      });
 
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/upload`,
@@ -104,20 +174,17 @@ export default function DashboardPage() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      const newDoc: Document = {
-        id: response.data.document_id,
-        filename: file.name,
-        uploaded_at: new Date().toISOString(),
-      };
-      setDocuments((prev) => [newDoc, ...prev]);
-      setFile(null);
+      const docId = response.data.document_id;
+      setPollingDocId(docId);
+      setProgressState({ status: "processing", progress: 15 });
+      setFiles([]);
 
       const fileInput = document.getElementById("file-input") as HTMLInputElement;
       if (fileInput) fileInput.value = "";
     } catch (err) {
-      setUploadError("Upload failed. Make sure the backend is running.");
-    } finally {
+      setUploadError("Upload failed. Make sure the backend service is running.");
       setUploading(false);
+      setProgressState(null);
     }
   };
 
@@ -173,7 +240,7 @@ export default function DashboardPage() {
             
             <h2 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
               <Upload className="w-4 h-4 text-zinc-400" />
-              Upload PDF
+              Upload PDF Bundle
             </h2>
 
             {/* Drop Zone */}
@@ -182,33 +249,91 @@ export default function DashboardPage() {
                 id="file-input"
                 type="file"
                 accept=".pdf"
+                multiple
                 onChange={handleFileChange}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                disabled={uploading}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
               />
               
               <div className="w-10 h-10 bg-zinc-800 border border-zinc-700/50 text-zinc-400 rounded-xl flex items-center justify-center mb-3">
                 <FileUp className="w-5 h-5" />
               </div>
 
-              <span className="text-sm text-zinc-300 font-medium mb-1">Click to select a PDF or drag it here</span>
-              <span className="text-xs text-zinc-600">Up to 10MB per document</span>
+              <span className="text-sm text-zinc-300 font-medium mb-1">Click to select PDFs or drag them here</span>
+              <span className="text-xs text-zinc-600">Up to 5 files, under 10MB each</span>
             </div>
 
-            {/* Selected file + upload button */}
-            {file && (
-              <div className="mt-4 flex items-center justify-between bg-zinc-950/60 border border-zinc-800 rounded-lg px-4 py-2.5 text-sm">
-                <div className="flex items-center gap-2 truncate pr-2">
-                  <span className="text-emerald-400 text-xs">✓</span>
-                  <span className="text-white font-medium truncate">{file.name}</span>
-                  <span className="text-zinc-600 text-xs shrink-0">({(file.size / (1024 * 1024)).toFixed(2)} MB)</span>
+            {/* Selected files listing */}
+            {files.length > 0 && !uploading && (
+              <div className="mt-4 flex flex-col gap-2.5 bg-zinc-950/60 border border-zinc-800 rounded-xl p-4">
+                <div className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-1">
+                  Selected Files ({files.length}/5)
                 </div>
-                <button
-                  onClick={handleUpload}
-                  disabled={uploading}
-                  className="bg-zinc-100 text-zinc-900 font-medium px-5 py-1.5 rounded-lg text-sm transition-all duration-200 hover:bg-white shrink-0 disabled:bg-zinc-800 disabled:text-zinc-600"
-                >
-                  {uploading ? "Uploading..." : "Upload"}
-                </button>
+                <div className="flex flex-col gap-2 max-h-40 overflow-y-auto pr-1">
+                  {files.map((file, idx) => (
+                    <div key={idx} className="flex items-center justify-between text-xs text-zinc-300 bg-zinc-900/50 border border-zinc-800/50 rounded-lg px-3 py-2">
+                      <div className="flex items-center gap-2 truncate pr-2">
+                        <span className="text-amber-500">•</span>
+                        <span className="truncate font-medium text-white">{file.name}</span>
+                        <span className="text-zinc-600 shrink-0">({(file.size / (1024 * 1024)).toFixed(2)} MB)</span>
+                      </div>
+                      <button
+                        onClick={() => setFiles(prev => prev.filter((_, i) => i !== idx))}
+                        className="text-zinc-500 hover:text-red-400 transition-colors"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex items-center justify-between mt-2 pt-3 border-t border-zinc-800/50">
+                  <span className="text-xs text-zinc-500">
+                    Total size: {((files.reduce((acc, f) => acc + f.size, 0)) / (1024 * 1024)).toFixed(2)} MB
+                  </span>
+                  <button
+                    onClick={handleUpload}
+                    disabled={uploading}
+                    className="bg-amber-500 hover:bg-amber-400 text-zinc-950 font-semibold px-6 py-2 rounded-lg text-xs md:text-sm transition-all duration-200 shrink-0 disabled:bg-zinc-800 disabled:text-zinc-600 shadow-[0_4px_12px_rgba(245,158,11,0.2)] hover:shadow-[0_4px_16px_rgba(245,158,11,0.35)]"
+                  >
+                    Upload and Process
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Real-time Glowing Progress Card */}
+            {progressState && (
+              <div className="mt-6 border border-zinc-850 bg-zinc-950/60 rounded-xl p-5 relative overflow-hidden">
+                {/* Glowing subtle top bar */}
+                <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-amber-500/20 via-amber-500 to-amber-500/20" />
+                
+                <div className="flex items-center justify-between mb-3 text-xs md:text-sm">
+                  <div className="flex items-center gap-2.5">
+                    <span className="flex h-2.5 w-2.5 relative shrink-0">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
+                    </span>
+                    <span className="text-zinc-300 font-medium capitalize flex items-center gap-1.5">
+                      {progressState.status === "uploading" && "Uploading to secure gateway..."}
+                      {progressState.status === "processing" && "Initializing pipeline..."}
+                      {progressState.status === "extracting" && "Parsing layout and pages..."}
+                      {progressState.status === "chunking" && "Creating semantic boundaries..."}
+                      {progressState.status === "embedding" && "Vectorizing database chunks..."}
+                      {!["processing", "extracting", "chunking", "embedding", "uploading"].includes(progressState.status) && progressState.status}
+                      <Loader2 className="w-3.5 h-3.5 animate-spin text-amber-500 shrink-0" />
+                    </span>
+                  </div>
+                  <span className="text-amber-400 font-semibold">{progressState.progress}%</span>
+                </div>
+
+                {/* Outer bar */}
+                <div className="w-full bg-zinc-900 rounded-full h-2 overflow-hidden border border-zinc-800">
+                  {/* Glowing Inner bar */}
+                  <div
+                    className="bg-gradient-to-r from-amber-500 to-amber-400 h-full rounded-full transition-all duration-300 shadow-[0_0_8px_rgba(245,158,11,0.5)]"
+                    style={{ width: `${progressState.progress}%` }}
+                  />
+                </div>
               </div>
             )}
 
