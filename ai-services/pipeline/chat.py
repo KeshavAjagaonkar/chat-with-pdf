@@ -14,7 +14,7 @@ SYSTEM_PROMPT = """You are a precise document assistant. Answer questions using 
 
 RULES:
 1. Answer strictly from the context below. If the information is not present, say: "I couldn't find this information in the document."
-2. When referencing specific information, cite the page number shown in brackets (e.g., "According to **Page 3**, ...").
+2. When referencing specific information, cite both the page number and filename shown in brackets (e.g., "According to **Page 3 of lease_agreement.pdf**, ...").
 3. Use **bold** for key terms, names, dates, numbers, and important concepts.
 4. Structure your responses clearly using markdown:
    - Use bullet points for lists of items or features.
@@ -27,17 +27,7 @@ RULES:
 
 def _build_context(context_chunks: list) -> str:
     """
-    Builds the document context section of the prompt.
-
-    Accepts either list[dict] (new format with metadata) or list[str] (legacy).
-    Each chunk is separated by a horizontal rule for visual clarity in the prompt.
-    Page labels are prepended to each chunk so the LLM can cite specific pages.
-
-    Design decisions:
-    - Page labels use square brackets [Page N] which is a clear, parseable format.
-    - Chunks are separated with --- to help the LLM distinguish context boundaries.
-    - Graceful fallback: if a chunk has no page metadata (old documents), it's
-      included without a page label. The LLM simply won't cite a page for it.
+    Builds the document context section of the prompt, appending page numbers and filenames.
     """
     context_parts = []
 
@@ -45,18 +35,23 @@ def _build_context(context_chunks: list) -> str:
         if isinstance(chunk, dict):
             text = chunk.get("text", "")
             pages = chunk.get("metadata", {}).get("pages", [])
+            filename = chunk.get("metadata", {}).get("filename", "")
+
+            file_suffix = f" of {filename}" if filename else ""
 
             if pages:
                 if len(pages) == 1:
-                    page_label = f"[Page {pages[0]}]"
+                    page_label = f"[Page {pages[0]}{file_suffix}]"
                 else:
-                    page_label = f"[Pages {pages[0]}–{pages[-1]}]"
+                    page_label = f"[Pages {pages[0]}–{pages[-1]}{file_suffix}]"
                 context_parts.append(f"{page_label}\n{text}")
             else:
-                context_parts.append(text)
+                if filename:
+                    context_parts.append(f"[File {filename}]\n{text}")
+                else:
+                    context_parts.append(text)
         else:
-            # Legacy fallback: plain string chunks (from old documents
-            # or the non-streaming /chat endpoint if called directly).
+            # Legacy fallback
             context_parts.append(str(chunk))
 
     return "\n\n---\n\n".join(context_parts)

@@ -6,3 +6,4 @@ pgvector
 google-genai
 python-dotenv
 python-multipart
+redis

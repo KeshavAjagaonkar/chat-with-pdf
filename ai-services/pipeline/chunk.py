@@ -31,7 +31,13 @@ def chunk_text(pages: list[dict], chunk_size: int = 500, overlap: int = 50) -> l
         words = page["text"].split()
         page_num = page["page"]
         for word in words:
-            word_stream.append((word, page_num))
+            # Guard against massive strings without spaces (e.g. embedded binary or base64 data)
+            # that would overflow token constraints at embedding time.
+            if len(word) > 1000:
+                for sub_word in [word[idx:idx+1000] for idx in range(0, len(word), 1000)]:
+                    word_stream.append((sub_word, page_num))
+            else:
+                word_stream.append((word, page_num))
 
     if not word_stream:
         return []
