@@ -35,41 +35,76 @@ const upload = multer({
     },
 });
 
-router.post("/", requireAuth, upload.single("file"), async (req, res) => {
+router.post("/", requireAuth, upload.array("files", 5), async (req, res) => {
+    const files = req.files || [];
     try {
-        // Check if fileFilter rejected the file (non-PDF)
+        // Check if fileFilter rejected any file (non-PDF)
         if (req.fileValidationError) {
+            for (const file of files) {
+                if (fs.existsSync(file.path)) {
+                    fs.unlinkSync(file.path);
+                }
+            }
             return res.status(400).json({ error: req.fileValidationError });
         }
 
-        const file = req.file;
         const userId = req.userId;
 
-        if (!file) {
-            return res.status(400).json({ error: "No file uploaded" });
+        if (!files || files.length === 0) {
+            return res.status(400).json({ error: "No files uploaded" });
         }
 
-        const formData = new FormData();
-        formData.append("file", fs.createReadStream(file.path), file.originalname);
-        formData.append("user_id", userId);
+        let documentId = null;
 
-        const response = await axios.post(
-            `${process.env.PYTHON_SERVICE_URL}/process`,
-            formData,
-            { headers: formData.getHeaders() }
-        );
+        // Process all files sequentially to ensure the first file initializes document_id
+        // and subsequent files append their contents to the exact same document ID.
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            const formData = new FormData();
+            formData.append("file", fs.createReadStream(file.path), file.originalname);
+            formData.append("user_id", userId);
+            if (documentId) {
+                formData.append("document_id", documentId.toString());
+            }
 
-        fs.unlinkSync(file.path);
-        return res.json(response.data);
+            const response = await axios.post(
+                `${process.env.PYTHON_SERVICE_URL}/process`,
+                formData,
+                { headers: formData.getHeaders() }
+            );
+
+            if (i === 0) {
+                documentId = response.data.document_id;
+            }
+        }
+
+        // Cleanup all local temporary files
+        for (const file of files) {
+            if (fs.existsSync(file.path)) {
+                fs.unlinkSync(file.path);
+            }
+        }
+
+        return res.json({
+            document_id: documentId,
+            filenames: files.map((f) => f.originalname),
+            status: "processing",
+        });
 
     } catch (error) {
+        // Clean up all local temporary files under failure modes
+        for (const file of files) {
+            if (fs.existsSync(file.path)) {
+                fs.unlinkSync(file.path);
+            }
+        }
+
         // Handle multer file-size errors specifically.
-        // Multer throws a special MulterError object when limits are exceeded.
         if (error.code === "LIMIT_FILE_SIZE") {
-            return res.status(400).json({ error: "File must be under 10MB" });
+            return res.status(400).json({ error: "Each file must be under 10MB" });
         }
         console.error("Upload error:", error.message);
-        return res.status(500).json({ error: "Failed to process PDF" });
+        return res.status(500).json({ error: "Failed to process PDFs" });
     }
 });
 

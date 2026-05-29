@@ -62,4 +62,27 @@ router.delete("/:id", requireAuth, async (req, res) => {
     }
 });
 
+// GET /api/documents/status/:id
+// Returns the real-time ingestion and embedding status of a document.
+router.get("/status/:id", requireAuth, async (req, res) => {
+    try {
+        const userId = req.userId;
+        const documentId = req.params.id;
+
+        const response = await axios.get(
+            `${process.env.PYTHON_SERVICE_URL}/documents/status/${documentId}`,
+            { params: { user_id: userId } }
+        );
+
+        return res.json(response.data);
+
+    } catch (error) {
+        if (error.response && error.response.status === 403) {
+            return res.status(403).json({ error: "You don't have access to this document" });
+        }
+        console.error("Document status error:", error.message);
+        return res.status(500).json({ error: "Failed to fetch document status" });
+    }
+});
+
 export default router;
