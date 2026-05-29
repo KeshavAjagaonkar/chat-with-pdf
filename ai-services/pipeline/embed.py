@@ -1,3 +1,5 @@
+import time
+import random
 from google import genai
 from google.genai import types
 from dotenv import load_dotenv
@@ -8,37 +10,42 @@ load_dotenv()
 client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
 
-def generate_embeddings(chunks: list[dict]) -> list[dict]:
+def generate_embeddings(chunks: list[dict], filename: str = None) -> list[dict]:
     """
     Generates embeddings for structured chunk objects.
 
     Args:
         chunks: List of {"text": str, "pages": [int]} from chunk_text.
+        filename: Optional filename to link chunks to their target document.
 
     Returns:
         List of {"index": int, "text": str, "embedding": list[float], "metadata": dict}
         ready for storage.
-
-    Design decisions:
-    - Only the text is embedded (not page metadata). Including "[Page 3]" in the
-      embedding input would pollute the semantic vector — the embedding should
-      represent the *meaning* of the content, not its location in the PDF.
-    - Page metadata is carried through as a separate "metadata" dict so it can
-      be stored in a dedicated JSONB column (clean separation of content vs. metadata).
-    - Each chunk is embedded individually rather than batched because the Gemini
-      embedding API processes one content string per call. If the API adds batch
-      support in the future, this can be optimized.
     """
     embedded_chunks = []
 
     for i, chunk in enumerate(chunks):
         text = chunk["text"]
 
-        response = client.models.embed_content(
-            model="gemini-embedding-001",
-            contents=text,
-            config=types.EmbedContentConfig(task_type="RETRIEVAL_DOCUMENT"),
-        )
+        # Exponential backoff with jitter retry loop for rate limit protection (HTTP 429)
+        retries = 5
+        delay = 1.0
+        response = None
+
+        for attempt in range(retries):
+            try:
+                response = client.models.embed_content(
+                    model="gemini-embedding-001",
+                    contents=text,
+                    config=types.EmbedContentConfig(task_type="RETRIEVAL_DOCUMENT"),
+                )
+                break
+            except Exception as e:
+                if attempt == retries - 1:
+                    raise e
+                # Wait with added randomized jitter to prevent thundering herd crashes
+                time.sleep(delay + random.uniform(0, 0.5))
+                delay *= 2.0
 
         embedding = response.embeddings[0].values
 
@@ -48,6 +55,7 @@ def generate_embeddings(chunks: list[dict]) -> list[dict]:
             "embedding": list(embedding),
             "metadata": {
                 "pages": chunk.get("pages", []),
+                "filename": filename,
             },
         })
 

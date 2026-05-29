@@ -18,12 +18,16 @@ def extract_text_from_pdf(pdf_path: str) -> list[dict]:
       a corrupt annotation.
     """
     document = fitz.open(pdf_path)
+    if document.is_encrypted:
+        raise ValueError("PDF is encrypted and password-protected")
+
     pages = []
 
     for page_num in range(len(document)):
         try:
             page = document[page_num]
-            text = page.get_text().strip()
+            # sort=True sorts text spans vertically then horizontally, reading columns in sequential natural flow
+            text = page.get_text("text", sort=True).strip()
 
             # Skip empty pages — no useful content to chunk or embed.
             # This is common in scanned PDFs with blank separator pages
@@ -42,4 +46,8 @@ def extract_text_from_pdf(pdf_path: str) -> list[dict]:
             continue
 
     document.close()
+
+    if not pages:
+        raise ValueError("This PDF appears to be scanned or contains only images. Selectable text is required.")
+
     return pages
