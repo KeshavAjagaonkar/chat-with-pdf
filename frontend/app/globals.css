@@ -56,6 +56,48 @@ body {
     linear-gradient(to bottom, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
 }
 
+/* ── Border Beam Animation ─────────────────────────────────────────────────
+   A high-end, hardware-accelerated border animation where a beam of light
+   runs seamlessly along the rounded capsule border. */
+@keyframes rotate-gradient {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-border-beam {
+  position: relative;
+  z-index: 10;
+}
+
+.animate-border-beam::before {
+  content: "";
+  position: absolute;
+  inset: -1.2px; /* border thickness */
+  border-radius: 9999px; /* Matches capsule pill shape */
+  padding: 1.2px;
+  background: conic-gradient(
+    from 0deg,
+    transparent 35%,
+    rgba(255, 255, 255, 0.85) 50%, /* Bright running white light */
+    rgba(245, 158, 11, 1) 60%,     /* Gorgeous amber trailing glow */
+    transparent 75%
+  );
+  -webkit-mask: 
+     linear-gradient(#fff 0 0) content-box, 
+     linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  z-index: -1;
+  animation: rotate-gradient 4s linear infinite;
+  pointer-events: none;
+}
+
+
+
 /* ── Autofill & Input Readability Overrides ─────────────────────────────────
    Ensures text in fields is ALWAYS high contrast and perfectly visible,
    even during browser auto-fill event chains. */

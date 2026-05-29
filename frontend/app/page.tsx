@@ -80,7 +80,7 @@ export default function LandingPage() {
           
           {/* Left — Copy */}
           <div className="max-w-xl">
-            <div className="inline-flex items-center gap-2 bg-zinc-900 border border-zinc-800 text-zinc-400 text-xs px-3 py-1.5 rounded-full mb-6">
+            <div className="inline-flex items-center gap-2 bg-zinc-900/90 animate-border-beam text-zinc-400 text-xs px-3 py-1.5 rounded-full mb-6">
               <Zap className="w-3 h-3 text-amber-400" />
               Powered by Gemini 2.5 Flash
             </div>
