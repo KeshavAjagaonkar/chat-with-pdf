@@ -202,12 +202,8 @@ async def chat_stream(request: ChatRequest):
                 # Instantly stream cached response!
                 def stream_cached_response():
                     content = cache_data['content']
-                    lines = content.split("\n")
-                    for i, line in enumerate(lines):
-                        if i > 0:
-                            yield "data: \n\n"
-                        if line:
-                            yield f"data: {line}\n\n"
+                    # Yield as a single JSON-encoded chunk to preserve newlines
+                    yield f"data: {json.dumps(content)}\n\n"
                     if "sources" in cache_data:
                         yield f"data: [SOURCES]{json.dumps(cache_data['sources'])}\n\n"
                     yield "data: [DONE]\n\n"
@@ -229,13 +225,8 @@ async def chat_stream(request: ChatRequest):
             full_answer = ""
             for chunk in generate_answer_stream(request.question, relevant_chunks, request.chat_history):
                 full_answer += chunk
-                # Split chunk by newline to guarantee each line is a valid SSE 'data: ' prefixed event.
-                lines = chunk.split("\n")
-                for i, line in enumerate(lines):
-                    if i > 0:
-                        yield "data: \n\n"
-                    if line:
-                        yield f"data: {line}\n\n"
+                # JSON encode the chunk to safely transport newlines (\n) over SSE in a single line
+                yield f"data: {json.dumps(chunk)}\n\n"
 
             sources = []
             if relevant_chunks:

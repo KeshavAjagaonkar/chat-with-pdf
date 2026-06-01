@@ -330,7 +330,15 @@ export default function ChatPage({
                 streamBufferRef.current += data;
               } else {
                 // Normal text chunk — append to buffer (no re-render!)
-                streamBufferRef.current += data;
+                if (data.startsWith('"') && data.endsWith('"')) {
+                  try {
+                    streamBufferRef.current += JSON.parse(data);
+                  } catch (e) {
+                    streamBufferRef.current += data;
+                  }
+                } else {
+                  streamBufferRef.current += data;
+                }
               }
             }
           }

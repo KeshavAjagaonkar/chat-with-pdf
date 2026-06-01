@@ -132,7 +132,15 @@ router.post("/stream", requireAuth, async (req, res) => {
                         }
 
                         // Accumulate LLM assistant answer text
-                        fullAnswer += data;
+                        if (data.startsWith('"') && data.endsWith('"')) {
+                            try {
+                                fullAnswer += JSON.parse(data);
+                            } catch (e) {
+                                fullAnswer += data;
+                            }
+                        } else {
+                            fullAnswer += data;
+                        }
                     }
                 }
                 boundary = buffer.indexOf("\n\n");
