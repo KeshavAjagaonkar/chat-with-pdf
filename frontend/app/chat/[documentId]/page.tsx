@@ -252,24 +252,30 @@ export default function ChatPage({
     if (!question.trim() || loading) return;
 
     const userMessage: Message = { role: "user", content: question };
+
+    // Snapshot current messages BEFORE the state update so we have the
+    // correct, up-to-date history for the API call. setMessages is async
+    // and wouldn't reflect the new user message in the same tick anyway.
+    const historySnapshot = messages.slice(-6).map((m) => ({
+      role: m.role,
+      content: m.content,
+    }));
+
     setMessages((prev) => [...prev, userMessage]);
     setQuestion("");
     setLoading(true);
     setIsStreaming(false);
     setError("");
     streamBufferRef.current = "";
+    // Clear any leftover text from the previous stream's DOM node.
+    // React may reuse the same DOM element, so we must explicitly reset it.
+    if (streamingDivRef.current) {
+      streamingDivRef.current.textContent = "";
+    }
     userHasScrolledUpRef.current = false;  // Always snap to bottom on new send
 
     try {
       const token = await getToken();
-
-      // Build chat_history from the last 6 messages (3 user-assistant pairs).
-      // This gives the LLM enough context for follow-ups without
-      // overwhelming the prompt with too much history.
-      const recentMessages = messages.slice(-6).map((m) => ({
-        role: m.role,
-        content: m.content,
-      }));
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/chat/stream`,
@@ -282,7 +288,9 @@ export default function ChatPage({
           body: JSON.stringify({
             question: userMessage.content,
             document_id: parseInt(documentId),
-            chat_history: recentMessages,
+            // Use the snapshot taken before state mutation — this is the
+            // correct, up-to-date conversation history at time of send.
+            chat_history: historySnapshot,
           }),
         }
       );
@@ -386,6 +394,10 @@ export default function ChatPage({
       setLoading(false);
       setIsStreaming(false);
       streamBufferRef.current = "";
+      // Also clear the DOM node so it's pristine if React reuses it next render.
+      if (streamingDivRef.current) {
+        streamingDivRef.current.textContent = "";
+      }
     }
   }, [question, loading, messages, documentId, getToken]);
 
@@ -578,7 +590,10 @@ export default function ChatPage({
                   ref={streamingDivRef}
                   className="text-sm leading-relaxed text-zinc-300 font-sans whitespace-pre-wrap"
                 />
-                <span className="inline-block w-0.5 h-4 bg-amber-400 rounded-full ml-0.5 align-middle cursor-blink mt-1" />
+                <span
+                  className="inline-block w-0.5 h-4 bg-amber-400 rounded-full ml-0.5 align-middle cursor-blink mt-1"
+                  style={{ animation: "cursor-blink 1s step-end infinite" }}
+                />
               </div>
             </div>
           )}
