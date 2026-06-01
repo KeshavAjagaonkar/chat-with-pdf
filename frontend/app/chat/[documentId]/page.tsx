@@ -182,6 +182,14 @@ export default function ChatPage({
   const [error, setError] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const isScrolledUpRef = useRef(false);
+
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLDivElement;
+    // If the user scrolls up more than 50px from the bottom, they are reading history
+    const isAtBottom = target.scrollHeight - target.scrollTop - target.clientHeight < 50;
+    isScrolledUpRef.current = !isAtBottom;
+  };
 
   // Ref-based buffer for smooth streaming.
   // Chunks accumulate in the ref WITHOUT triggering re-renders.
@@ -212,7 +220,10 @@ export default function ChatPage({
 
   // ─── Auto-scroll to bottom when messages change ──────────────────────────
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (!isScrolledUpRef.current) {
+      // Use 'auto' instead of 'smooth' during fast streams so the browser's scroll queue doesn't lag
+      bottomRef.current?.scrollIntoView({ behavior: "auto" });
+    }
   }, [messages]);
 
   // ─── Focus input after loading or sending ────────────────────────────────
@@ -237,6 +248,7 @@ export default function ChatPage({
     setIsStreaming(false);
     setError("");
     streamBufferRef.current = "";
+    isScrolledUpRef.current = false;
 
     try {
       const token = await getToken();
@@ -421,7 +433,10 @@ export default function ChatPage({
       </header>
 
       {/* ── Messages Area ───────────────────────────────────────────────── */}
-      <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-zinc-800 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-zinc-700">
+      <div 
+        onScroll={handleScroll}
+        className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-zinc-800 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-zinc-700"
+      >
         <div className="max-w-3xl mx-auto px-6 py-6 flex flex-col gap-5">
           
           {/* Loading history skeleton */}
