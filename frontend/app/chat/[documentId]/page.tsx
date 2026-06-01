@@ -183,12 +183,22 @@ export default function ChatPage({
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const isScrolledUpRef = useRef(false);
+  const lastScrollHeightRef = useRef(0);
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const target = e.target as HTMLDivElement;
-    // If the user scrolls up more than 50px from the bottom, they are reading history
-    const isAtBottom = target.scrollHeight - target.scrollTop - target.clientHeight < 50;
-    isScrolledUpRef.current = !isAtBottom;
+    
+    // If the scrollHeight changed, this scroll event is a side effect of new content 
+    // being added (layout shift), not a user manually scrolling.
+    if (target.scrollHeight !== lastScrollHeightRef.current) {
+      lastScrollHeightRef.current = target.scrollHeight;
+      return;
+    }
+    
+    // This is a genuine user scroll. Check their position.
+    // Use a tight threshold (10px) so even a small scroll up pauses auto-scroll.
+    const distanceToBottom = target.scrollHeight - target.scrollTop - target.clientHeight;
+    isScrolledUpRef.current = distanceToBottom > 10;
   };
 
   // Ref-based buffer for smooth streaming.
