@@ -181,30 +181,32 @@ export default function ChatPage({
   const [loadingHistory, setLoadingHistory] = useState(true);
   const [error, setError] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const isScrolledUpRef = useRef(false);
-  const lastScrollHeightRef = useRef(0);
+  const userHasScrolledUpRef = useRef(false);
 
-  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    const target = e.target as HTMLDivElement;
-    
-    // If the scrollHeight changed, this scroll event is a side effect of new content 
-    // being added (layout shift), not a user manually scrolling.
-    if (target.scrollHeight !== lastScrollHeightRef.current) {
-      lastScrollHeightRef.current = target.scrollHeight;
-      return;
-    }
-    
-    // This is a genuine user scroll. Check their position.
-    // Use a tight threshold (10px) so even a small scroll up pauses auto-scroll.
-    const distanceToBottom = target.scrollHeight - target.scrollTop - target.clientHeight;
-    isScrolledUpRef.current = distanceToBottom > 10;
-  };
-
-  // Ref-based buffer for smooth streaming.
-  // Chunks accumulate in the ref WITHOUT triggering re-renders.
-  // A setInterval syncs the buffer to state at ~20fps (every 50ms).
+  // Direct DOM ref for the streaming message.
+  // During streaming we bypass React state entirely and mutate this div's
+  // innerHTML directly. This is the same technique used by ChatGPT —
+  // it eliminates all mid-stream re-renders, which is the root cause of
+  // the scroll fighting and page juggling the user was experiencing.
+  const streamingDivRef = useRef<HTMLDivElement>(null);
   const streamBufferRef = useRef("");
+
+  // ─── Scroll helpers ──────────────────────────────────────────────────────
+  const scrollToBottom = useCallback(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+    container.scrollTop = container.scrollHeight;
+  }, []);
+
+  const handleScroll = useCallback(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+    const distanceToBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
+    // If the user scrolls more than 80px from the bottom, pause auto-scroll.
+    userHasScrolledUpRef.current = distanceToBottom > 80;
+  }, []);
 
   // ─── Load chat history on mount ──────────────────────────────────────────
   useEffect(() => {
@@ -228,13 +230,14 @@ export default function ChatPage({
     loadHistory();
   }, [documentId, getToken]);
 
-  // ─── Auto-scroll to bottom when messages change ──────────────────────────
+  // ─── Auto-scroll when committed messages change (new message sent/received) ──
+  // This only fires for discrete events (send message, history load),
+  // NOT during streaming — streaming uses direct DOM mutation below.
   useEffect(() => {
-    if (!isScrolledUpRef.current) {
-      // Use 'auto' instead of 'smooth' during fast streams so the browser's scroll queue doesn't lag
-      bottomRef.current?.scrollIntoView({ behavior: "auto" });
+    if (!userHasScrolledUpRef.current) {
+      scrollToBottom();
     }
-  }, [messages]);
+  }, [messages, scrollToBottom]);
 
   // ─── Focus input after loading or sending ────────────────────────────────
   useEffect(() => {
@@ -251,14 +254,10 @@ export default function ChatPage({
     setMessages((prev) => [...prev, userMessage]);
     setQuestion("");
     setLoading(true);
-    // IMPORTANT: Do NOT set isStreaming=true here.
-    // isStreaming should only be true when we're actually receiving chunks.
-    // The gap between loading=true and isStreaming=true is when the
-    // "Thinking..." indicator shows — while we wait for the first chunk.
     setIsStreaming(false);
     setError("");
     streamBufferRef.current = "";
-    isScrolledUpRef.current = false;
+    userHasScrolledUpRef.current = false;  // Always snap to bottom on new send
 
     try {
       const token = await getToken();
@@ -289,32 +288,18 @@ export default function ChatPage({
 
       if (!response.ok) throw new Error("Stream request failed");
 
-      // Add empty assistant message that we'll fill via streaming.
-      // NOW mark streaming as active since we're about to receive chunks.
-      setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
+      // Mark streaming as active. This renders the streaming bubble in the UI.
+      // We do NOT add anything to the messages[] array yet — the streaming
+      // message lives in a separate DOM node (streamingDivRef) and is mutated
+      // directly. This means ZERO React re-renders during streaming.
       setIsStreaming(true);
+
+      // Snap to bottom when streaming starts so user sees the first token
+      scrollToBottom();
 
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
       if (!reader) throw new Error("No reader available");
-
-      // Sync buffer → state at 20fps (every 50ms).
-      // This is the key to smooth streaming: chunks accumulate in the ref
-      // instantly (no re-render), and the UI updates at a fixed rate.
-      const intervalId = setInterval(() => {
-        setMessages((prev) => {
-          const updated = [...prev];
-          const lastMsg = updated[updated.length - 1];
-          if (lastMsg && lastMsg.content !== streamBufferRef.current) {
-            updated[updated.length - 1] = {
-              ...lastMsg,
-              content: streamBufferRef.current,
-            };
-            return updated;
-          }
-          return prev; // No change — skip re-render
-        });
-      }, 50);
 
       let done = false;
       let sourcesData: Source[] = [];
@@ -353,14 +338,23 @@ export default function ChatPage({
                 } else if (data.startsWith("[Error:")) {
                   streamBufferRef.current += data;
                 } else {
+                  // Decode the JSON-encoded chunk to restore newlines.
+                  let decoded = data;
                   if (data.startsWith('"') && data.endsWith('"')) {
-                    try {
-                      streamBufferRef.current += JSON.parse(data);
-                    } catch (e) {
-                      streamBufferRef.current += data;
+                    try { decoded = JSON.parse(data); } catch { /* use raw */ }
+                  }
+                  streamBufferRef.current += decoded;
+
+                  // ── Direct DOM mutation: NO React re-render ────────────
+                  // Append the new text directly to the streaming div.
+                  // This is the key: the browser paints only the new text node,
+                  // not the entire component tree. Zero scroll fighting.
+                  if (streamingDivRef.current) {
+                    streamingDivRef.current.textContent = streamBufferRef.current;
+                    // Only auto-scroll if user has not manually scrolled up
+                    if (!userHasScrolledUpRef.current) {
+                      scrollToBottom();
                     }
-                  } else {
-                    streamBufferRef.current += data;
                   }
                 }
               }
@@ -371,35 +365,24 @@ export default function ChatPage({
         }
       }
 
-      // Stream finished — do final sync and cleanup
-      clearInterval(intervalId);
-
-      // Final sync: ensure state matches the complete buffer + attach sources.
-      setMessages((prev) => {
-        const updated = [...prev];
-        const lastMsg = updated[updated.length - 1];
-        updated[updated.length - 1] = {
-          ...lastMsg,
+      // Stream finished.
+      // NOW commit the full response into React state as a proper message.
+      // This triggers exactly ONE re-render. ReactMarkdown will then format
+      // the plain text into beautiful structured markdown.
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
           content: streamBufferRef.current,
           sources: sourcesData.length > 0 ? sourcesData : undefined,
-        };
-        return updated;
-      });
+        },
+      ]);
     } catch (err) {
       setError("Something went wrong. Please try again.");
-      // Clean up the empty assistant message if the stream failed
-      // before any content was received. Without this, users would see
-      // a ghost empty bubble after an error.
-      setMessages((prev) => {
-        const last = prev[prev.length - 1];
-        if (last && last.role === "assistant" && !last.content) {
-          return prev.slice(0, -1);
-        }
-        return prev;
-      });
     } finally {
       setLoading(false);
       setIsStreaming(false);
+      streamBufferRef.current = "";
     }
   }, [question, loading, messages, documentId, getToken]);
 
@@ -443,7 +426,8 @@ export default function ChatPage({
       </header>
 
       {/* ── Messages Area ───────────────────────────────────────────────── */}
-      <div 
+      <div
+        ref={scrollContainerRef}
         onScroll={handleScroll}
         className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-zinc-800 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-zinc-700"
       >
@@ -482,96 +466,75 @@ export default function ChatPage({
             </div>
           )}
 
-          {/* Message list */}
-          {messages.map((msg, i) => {
-            const isCurrentlyStreaming =
-              isStreaming && i === messages.length - 1 && msg.role === "assistant";
-
-            return (
-              <div key={i} className="flex flex-col">
-                {msg.role === "user" ? (
-                  /* ── User Message ─────────────────────────────────── */
-                  <div className="flex justify-end">
-                    <div className="max-w-[75%] bg-zinc-900 border border-zinc-800 text-zinc-100 rounded-2xl rounded-br-md px-4 py-3 text-sm leading-relaxed">
-                      {msg.content}
-                    </div>
+          {/* ── Committed message list ────────────────────────────────────
+               Only contains finalized messages. ReactMarkdown runs on these.
+               This list is NEVER mutated during streaming — zero re-renders.
+          ────────────────────────────────────────────────────────────── */}
+          {messages.map((msg, i) => (
+            <div key={i} className="flex flex-col">
+              {msg.role === "user" ? (
+                /* ── User Message ─────────────────────────────────── */
+                <div className="flex justify-end">
+                  <div className="max-w-[75%] bg-zinc-900 border border-zinc-800 text-zinc-100 rounded-2xl rounded-br-md px-4 py-3 text-sm leading-relaxed">
+                    {msg.content}
                   </div>
-                ) : (
-                  /* ── Assistant Message ────────────────────────────── */
-                  <div className="flex gap-3.5 max-w-[90%]">
-                    {/* Sparkles avatar */}
-                    <div className="w-8 h-8 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center shrink-0 mt-1 select-none text-amber-400">
-                      <Sparkles className="w-4 h-4" />
+                </div>
+              ) : (
+                /* ── Assistant Message (committed, fully formatted) ── */
+                <div className="flex gap-3.5 max-w-[90%]">
+                  <div className="w-8 h-8 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center shrink-0 mt-1 select-none text-amber-400">
+                    <Sparkles className="w-4 h-4" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-2 select-none">
+                      <span className="text-[10px] font-sans font-semibold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2.5 py-0.5 rounded">
+                        chat-with-pdf AI
+                      </span>
+                      <span className="text-[9px] text-zinc-500 uppercase tracking-wider font-bold">Traceable Response</span>
                     </div>
-
-                    <div className="flex-1 min-w-0">
-                      {/* Clean header label */}
-                      <div className="flex items-center gap-2 mb-2 select-none">
-                        <span className="text-[10px] font-sans font-semibold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2.5 py-0.5 rounded">
-                          chat-with-pdf AI
-                        </span>
-                        <span className="text-[9px] text-zinc-500 uppercase tracking-wider font-bold">Traceable Response</span>
-                      </div>
-
-                      {/* Render markdown for ALL states (streaming + final). */}
-                      <div className="text-sm leading-relaxed text-zinc-350 prose-chat font-sans">
-                        <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
-                          {msg.content}
-                        </ReactMarkdown>
-
-                        {/* Streaming cursor — thin blinking line. */}
-                        {isCurrentlyStreaming && (
-                          <span
-                            className="inline-block w-0.5 h-4 bg-amber-400 rounded-full ml-0.5 align-middle cursor-blink"
-                          />
-                        )}
-                      </div>
-
-                      {/* ── Source Citations ──────────────────────────── */}
-                      {msg.sources && msg.sources.length > 0 && (
-                        <details className="mt-3 group">
-                          <summary className="text-xs text-zinc-500 hover:text-amber-400 cursor-pointer flex items-center gap-1.5 select-none transition font-medium">
-                            <ChevronRight className="w-3.5 h-3.5 transition-transform duration-200 group-open:rotate-90 text-zinc-600" />
-                            {msg.sources.length} source reference{msg.sources.length !== 1 ? "s" : ""} matched
-                          </summary>
-
-                          <div className="mt-2 space-y-2 pl-0.5">
-                            {msg.sources.map((src, si) => {
-                              const pageLabel = formatPageLabel(src.pages, src.filename);
-                              return (
-                                <div
-                                  key={si}
-                                  className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-3.5"
-                                >
-                                  <div className="flex items-center gap-2 mb-1.5 font-sans">
-                                    {pageLabel && (
-                                      <span className="text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded border border-amber-500/20 font-semibold uppercase tracking-wider">
-                                        {pageLabel}
-                                      </span>
-                                    )}
-                                    <span className="text-[10px] text-zinc-500 uppercase tracking-wider font-semibold">
-                                      Segment {si + 1}
+                    <div className="text-sm leading-relaxed font-sans">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+                        {msg.content}
+                      </ReactMarkdown>
+                    </div>
+                    {/* ── Source Citations ──────────────────────────── */}
+                    {msg.sources && msg.sources.length > 0 && (
+                      <details className="mt-3 group">
+                        <summary className="text-xs text-zinc-500 hover:text-amber-400 cursor-pointer flex items-center gap-1.5 select-none transition font-medium">
+                          <ChevronRight className="w-3.5 h-3.5 transition-transform duration-200 group-open:rotate-90 text-zinc-600" />
+                          {msg.sources.length} source reference{msg.sources.length !== 1 ? "s" : ""} matched
+                        </summary>
+                        <div className="mt-2 space-y-2 pl-0.5">
+                          {msg.sources.map((src, si) => {
+                            const pageLabel = formatPageLabel(src.pages, src.filename);
+                            return (
+                              <div key={si} className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-3.5">
+                                <div className="flex items-center gap-2 mb-1.5 font-sans">
+                                  {pageLabel && (
+                                    <span className="text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded border border-amber-500/20 font-semibold uppercase tracking-wider">
+                                      {pageLabel}
                                     </span>
-                                  </div>
-                                  <p className="text-xs text-zinc-400 leading-relaxed font-sans">
-                                    {src.text.length > 300
-                                      ? src.text.slice(0, 300) + "…"
-                                      : src.text}
-                                  </p>
+                                  )}
+                                  <span className="text-[10px] text-zinc-500 uppercase tracking-wider font-semibold">
+                                    Segment {si + 1}
+                                  </span>
                                 </div>
-                              );
-                            })}
-                          </div>
-                        </details>
-                      )}
-                    </div>
+                                <p className="text-xs text-zinc-400 leading-relaxed font-sans">
+                                  {src.text.length > 300 ? src.text.slice(0, 300) + "…" : src.text}
+                                </p>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </details>
+                    )}
                   </div>
-                )}
-              </div>
-            );
-          })}
+                </div>
+              )}
+            </div>
+          ))}
 
-          {/* Thinking indicator — Replaced absurd dot with high-end RAG loader */}
+          {/* ── Thinking indicator (waiting for first token) ─────────── */}
           {loading && !isStreaming && (
             <div className="flex gap-3.5 max-w-[90%] animate-pulse">
               <div className="w-8 h-8 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center shrink-0 mt-1 text-amber-400">
@@ -584,6 +547,35 @@ export default function ChatPage({
                   </span>
                   <span className="text-[9px] text-zinc-500 uppercase tracking-wider font-bold">Scanning database index...</span>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* ── Live streaming bubble ────────────────────────────────────
+               This is rendered once when isStreaming=true and stays mounted
+               until the stream ends. Text is injected via direct DOM mutation
+               (streamingDivRef.textContent), so React never re-renders during
+               streaming. This is the key to zero scroll juggling.
+          ────────────────────────────────────────────────────────────── */}
+          {isStreaming && (
+            <div className="flex gap-3.5 max-w-[90%]">
+              <div className="w-8 h-8 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center shrink-0 mt-1 select-none text-amber-400">
+                <Sparkles className="w-4 h-4" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-2 select-none">
+                  <span className="text-[10px] font-sans font-semibold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2.5 py-0.5 rounded">
+                    chat-with-pdf AI
+                  </span>
+                  <span className="text-[9px] text-zinc-500 uppercase tracking-wider font-bold">Traceable Response</span>
+                </div>
+                {/* Plain text div — mutated directly, NO ReactMarkdown during streaming.
+                    On stream end, this unmounts and the committed message above renders with full markdown. */}
+                <div
+                  ref={streamingDivRef}
+                  className="text-sm leading-relaxed text-zinc-300 font-sans whitespace-pre-wrap"
+                />
+                <span className="inline-block w-0.5 h-4 bg-amber-400 rounded-full ml-0.5 align-middle cursor-blink mt-1" />
               </div>
             </div>
           )}
