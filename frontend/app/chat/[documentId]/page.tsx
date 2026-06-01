@@ -296,6 +296,7 @@ export default function ChatPage({
 
       let done = false;
       let sourcesData: Source[] = [];
+      let streamParserBuffer = ""; // Buffer to handle TCP packet fragmentation
 
       while (!done) {
         const { value, done: streamDone } = await reader.read();
@@ -303,44 +304,47 @@ export default function ChatPage({
 
         if (value) {
           const text = decoder.decode(value, { stream: true });
-          const lines = text.split("\n");
+          streamParserBuffer += text;
 
-          for (const line of lines) {
-            if (line.startsWith("data: ")) {
-              const data = line.slice(6);
+          let boundary = streamParserBuffer.indexOf("\n\n");
+          while (boundary !== -1) {
+            const event = streamParserBuffer.slice(0, boundary).trim();
+            streamParserBuffer = streamParserBuffer.slice(boundary + 2);
 
-              if (data === "[DONE]") {
-                // Stream complete — handled after the loop
-              } else if (data.startsWith("[SOURCES]")) {
-                // Parse source citations from JSON.
-                // Format: [SOURCES]<json_array>
-                const raw = data.slice(9);
-                try {
-                  sourcesData = JSON.parse(raw) as Source[];
-                } catch {
-                  // Fallback for old format (|||−separated strings).
-                  // This handles the transition period where the backend
-                  // hasn't been redeployed yet but the frontend has.
-                  sourcesData = raw
-                    .split("|||")
-                    .filter(Boolean)
-                    .map((text) => ({ text, pages: [] }));
-                }
-              } else if (data.startsWith("[Error:")) {
-                streamBufferRef.current += data;
-              } else {
-                // Normal text chunk — append to buffer (no re-render!)
-                if (data.startsWith('"') && data.endsWith('"')) {
+            const lines = event.split("\n");
+            for (const line of lines) {
+              if (line.startsWith("data: ")) {
+                const data = line.slice(6);
+
+                if (data === "[DONE]") {
+                  // Stream complete — handled after the loop
+                } else if (data.startsWith("[SOURCES]")) {
+                  const raw = data.slice(9);
                   try {
-                    streamBufferRef.current += JSON.parse(data);
-                  } catch (e) {
+                    sourcesData = JSON.parse(raw) as Source[];
+                  } catch {
+                    sourcesData = raw
+                      .split("|||")
+                      .filter(Boolean)
+                      .map((text) => ({ text, pages: [] }));
+                  }
+                } else if (data.startsWith("[Error:")) {
+                  streamBufferRef.current += data;
+                } else {
+                  if (data.startsWith('"') && data.endsWith('"')) {
+                    try {
+                      streamBufferRef.current += JSON.parse(data);
+                    } catch (e) {
+                      streamBufferRef.current += data;
+                    }
+                  } else {
                     streamBufferRef.current += data;
                   }
-                } else {
-                  streamBufferRef.current += data;
                 }
               }
             }
+            
+            boundary = streamParserBuffer.indexOf("\n\n");
           }
         }
       }
