@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { use } from "react";
+import { flushSync } from "react-dom";
 import axios from "axios";
 import { UserButton, useAuth } from "@clerk/nextjs";
 import ReactMarkdown from "react-markdown";
@@ -288,11 +289,13 @@ export default function ChatPage({
 
       if (!response.ok) throw new Error("Stream request failed");
 
-      // Mark streaming as active. This renders the streaming bubble in the UI.
-      // We do NOT add anything to the messages[] array yet — the streaming
-      // message lives in a separate DOM node (streamingDivRef) and is mutated
-      // directly. This means ZERO React re-renders during streaming.
-      setIsStreaming(true);
+      // flushSync forces React to synchronously commit this state update
+      // to the DOM before moving to the next line. Without this, setIsStreaming(true)
+      // is batched and the streaming div hasn't mounted yet when the first chunk
+      // arrives, making streamingDivRef.current null and losing early tokens.
+      flushSync(() => {
+        setIsStreaming(true);
+      });
 
       // Snap to bottom when streaming starts so user sees the first token
       scrollToBottom();
