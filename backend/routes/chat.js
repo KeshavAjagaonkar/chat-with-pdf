@@ -80,6 +80,16 @@ router.post("/stream", requireAuth, async (req, res) => {
         res.setHeader("Content-Type", "text/event-stream");
         res.setHeader("Cache-Control", "no-cache");
         res.setHeader("Connection", "keep-alive");
+        // Disable nginx/Railway reverse-proxy response buffering.
+        // Without this, the proxy buffers the entire SSE stream and delivers
+        // it in one burst at the end — the frontend gets all chunks AFTER
+        // the stream closes, resulting in empty committed messages.
+        res.setHeader("X-Accel-Buffering", "no");
+        // Disable TCP Nagle's algorithm so small SSE chunks are sent immediately
+        // instead of being coalesced into a larger packet by the OS.
+        if (res.socket) {
+            res.socket.setNoDelay(true);
+        }
 
         // Request the stream from Python.
         // responseType: 'stream' tells axios to return a Node.js ReadableStream
@@ -98,8 +108,15 @@ router.post("/stream", requireAuth, async (req, res) => {
 
         response.data.on("data", (chunk) => {
             const text = chunk.toString();
-            // Forward each chunk directly to the frontend instantly
+            // Forward each chunk directly to the frontend instantly.
             res.write(text);
+            // Flush the write buffer immediately so the browser receives
+            // each SSE event as it arrives, not batched at stream end.
+            // res.flush() is available when the 'compression' middleware is
+            // loaded; fall back to a no-op if it isn't present.
+            if (typeof res.flush === "function") {
+                res.flush();
+            }
 
             // Buffer the incoming chunks and split by event boundaries to handle TCP packet fragmentation.
             buffer += text;

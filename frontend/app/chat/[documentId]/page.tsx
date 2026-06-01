@@ -377,15 +377,19 @@ export default function ChatPage({
       }
 
       // Stream finished.
-      // NOW commit the full response into React state as a proper message.
-      // This triggers exactly ONE re-render. ReactMarkdown will then format
-      // the plain text into beautiful structured markdown.
+      // Snapshot the accumulated content and sources into local variables BEFORE
+      // calling setMessages. setMessages uses a functional updater that React may
+      // defer — if the finally block runs first it clears streamBufferRef.current
+      // to "", causing the committed message to have empty content.
+      const finalContent = streamBufferRef.current;
+      const finalSources = sourcesData.length > 0 ? sourcesData : undefined;
+
       setMessages((prev) => [
         ...prev,
         {
           role: "assistant",
-          content: streamBufferRef.current,
-          sources: sourcesData.length > 0 ? sourcesData : undefined,
+          content: finalContent,
+          sources: finalSources,
         },
       ]);
     } catch (err) {
