@@ -416,7 +416,7 @@ export default function ChatPage({
   // ─── Render ──────────────────────────────────────────────────────────────
 
   return (
-    <main className="min-h-screen flex flex-col bg-zinc-950 bg-grid-pattern text-zinc-300 selection:bg-amber-500/20 selection:text-white relative">
+    <main className="h-screen flex flex-col bg-zinc-950 bg-grid-pattern text-zinc-300 selection:bg-amber-500/20 selection:text-white relative overflow-hidden">
       {/* Decorative gradients */}
       <div className="absolute top-0 right-1/4 w-[400px] h-[200px] bg-amber-500/2 rounded-full blur-[90px] pointer-events-none" />
 
