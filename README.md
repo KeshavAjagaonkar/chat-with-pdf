@@ -406,6 +406,21 @@ The `Procfile` in `ai-services/` supports Railway's native deployment:
 web: uvicorn main:app --host 0.0.0.0 --port $PORT
 ```
 
+### Railway Redis configuration
+
+Redis must be deployed separately from `ai-services`; `localhost:6379` points
+to the FastAPI container itself and will not reach a Redis instance on Railway.
+
+1. Create a Redis service in the same Railway project and environment.
+2. Copy its private/internal connection URL into the `REDIS_URL` variable of
+   the `ai-services` service.
+3. Redeploy `ai-services` and verify its startup log reports a successful Redis
+   connection.
+
+Do not expose Redis through a public port. Only `ai-services` needs to connect
+to it over Railway's private network. Rotate any database credential that has
+appeared in logs, then update Railway's `DATABASE_URL` variable.
+
 ---
 
 ## 🧪 Running Tests
